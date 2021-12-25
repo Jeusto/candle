@@ -1,8 +1,8 @@
 package app.views.components;
 
-import app.views.Home;
-import app.views.Library;
-import app.views.Search;
+import app.views.tabs.Home;
+import app.views.tabs.Library;
+import app.views.tabs.Search;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,10 +12,11 @@ public class Tabs extends JTabbedPane {
         // Contenu
         Home home_panel = new Home();
         Library library_panel = new Library();
+        Search search_panel = new Search();
+
         addTab("Accueil", home_panel);
-        addTab("Recherche", new Search());
+        addTab("Recherche", search_panel);
         addTab("Ma bibliothèque", library_panel);
-        addTab("Mes statistiques", new JPanel());
 
         // Reglages
         JTabbedPane tab = new JTabbedPane();
@@ -25,7 +26,6 @@ public class Tabs extends JTabbedPane {
         setPreferredSize(newDim);
         setMaximumSize(newDim);
         setSize(newDim);
-        setFont(new Font(Font.SANS_SERIF, Font.BOLD, 14));
         revalidate();
     }
 }
