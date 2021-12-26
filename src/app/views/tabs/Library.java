@@ -1,32 +1,40 @@
 package app.views.tabs;
 
+import app.views.View;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 
 public class Library extends JPanel {
-    private JScrollPane leftPanel;
-    private JPanel mainPanel;
-    private HashMap<String, Integer> categoriesList;
-    private DefaultMutableTreeNode[] categoryNodes;
-    private JLabel currentCategory;
-    private JLabel currentPage;
+    private View view;
+    private JScrollPane left_panel;
+    private JPanel main_panel;
+    private JList list;
+    private DefaultListModel<String> books_list;
+    private HashMap<String, Integer> categories_list;
+    private HashMap<String, ArrayList<String>> current_category_books;
+    private DefaultMutableTreeNode[] category_nodes;
+    private JLabel current_category;
+    private JLabel number_of_results;
     private JButton nextPage;
     private JButton prevPage;
 
-    public Library(HashMap<String, Integer> categoriesList) throws Exception {
-        this.categoriesList = categoriesList;
+    public Library(View view, HashMap<String, Integer> categoriesList) throws Exception {
+        this.view = view;
+        this.categories_list = categoriesList;
 
         // ===== Content components ======
-        leftPanel = createLeftPanel();
-        mainPanel = createMainPanel();
+        left_panel = createLeftPanel();
+        main_panel = createMainPanel();
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, mainPanel);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, left_panel, main_panel);
         splitPane.setOneTouchExpandable(true);
         splitPane.setDividerSize(5);
 
@@ -48,7 +56,7 @@ public class Library extends JPanel {
         node_all.add(node_downloaded); node_all.add(node_read); node_all.add(node_not_read); node_all.add(node_available);
 
         // Tree categories
-        for (String category : categoriesList.keySet()) {
+        for (String category : categories_list.keySet()) {
             node_available.add(new DefaultMutableTreeNode(category));
         }
 
@@ -66,7 +74,12 @@ public class Library extends JPanel {
             }
             Object nodeInfo = node.getUserObject();
             if (node.isLeaf()) {
-                currentCategory.setText(nodeInfo.toString());
+                current_category.setText(nodeInfo.toString());
+                try {
+                    view.notify_category_change_performed(nodeInfo.toString());
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
             }
         });
 
@@ -84,17 +97,24 @@ public class Library extends JPanel {
     private JPanel createMainPanel() throws IOException {
         // ===== Content components ======
         // Category title
-        this.currentCategory = new JLabel("Livres téléchargés");
-        this.currentCategory.setFont((this.currentCategory.getFont()).deriveFont(Font.PLAIN, 22 ));
-        this.currentCategory.setPreferredSize(new Dimension(0, 50));
-        this.currentCategory.setMinimumSize(new Dimension(0, 50));
-        this.currentCategory.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
+        this.current_category = new JLabel("Livres téléchargés");
+        this.current_category.setFont((this.current_category.getFont()).deriveFont(Font.PLAIN, 22 ));
+        this.current_category.setPreferredSize(new Dimension(0, 50));
+        this.current_category.setMinimumSize(new Dimension(0, 50));
+        this.current_category.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
 
         // Top buttons
-        JButton readButton = new JButton("Lire");
-        // add invisible border to avoid button overlap
+        JButton read_button = new JButton("Lire");
         Image readIcon = ImageIO.read(getClass().getResource("/app/assets/read.png"));
-        readButton.setIcon(new ImageIcon(readIcon));
+        read_button.setIcon(new ImageIcon(readIcon));
+        read_button.addActionListener(e -> {
+            try {
+                view.notify_read_performed((String) list.getSelectedValue());
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
+        
         JButton downloadButton = new JButton("Télécharger");
         Image downloadIcon = ImageIO.read(getClass().getResource("/app/assets/download.png"));
         downloadButton.setIcon(new ImageIcon(downloadIcon));
@@ -103,16 +123,14 @@ public class Library extends JPanel {
         JPanel top = new JPanel();
         top.setLayout(new BoxLayout(top, FlowLayout.RIGHT));
         top.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        top.add(this.currentCategory);
-        top.add(readButton);
+        top.add(this.current_category);
+        top.add(read_button);
+        top.add(Box.createHorizontalStrut(10));
         top.add(downloadButton);
 
         // List of books in the center
-        DefaultListModel<String> l1 = new DefaultListModel<>();
-        for (int i = 0; i < 25; i++) {
-            l1.addElement("Livre " + i);
-        }
-        JList<String> list = new JList<>(l1);
+        books_list = new DefaultListModel<>();
+        list = new JList<>(books_list);
         list.setOpaque(false);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setLayoutOrientation(JList.VERTICAL);
@@ -128,14 +146,16 @@ public class Library extends JPanel {
         JPanel bottom = new JPanel();
         bottom.setLayout(new BoxLayout(bottom, BoxLayout.X_AXIS));
         bottom.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        this.currentPage = new JLabel("Page 1/43");
+        this.number_of_results = new JLabel("Nombres de livres dans cette catégorie = 0");
+        Image countIcon = ImageIO.read(getClass().getResource("/app/assets/count.png"));
+        number_of_results.setIcon(new ImageIcon(countIcon));
         this.prevPage = new JButton("Précédent");
         Image prevIcon = ImageIO.read(getClass().getResource("/app/assets/previous.png"));
         prevPage.setIcon(new ImageIcon(prevIcon));
         this.nextPage = new JButton("Suivant");
         Image nextIcon = ImageIO.read(getClass().getResource("/app/assets/next.png"));
         nextPage.setIcon(new ImageIcon(nextIcon));
-        bottom.add(currentPage);
+        bottom.add(number_of_results);
         bottom.add(Box.createHorizontalGlue());
         bottom.add(prevPage);
         bottom.add(nextPage);
@@ -154,5 +174,14 @@ public class Library extends JPanel {
         mainPanelWrapper.add(bottom, BorderLayout.SOUTH);
 
         return mainPanelWrapper;
+    }
+
+    public void show_results(HashMap<String, ArrayList<String>> results) {
+        current_category_books = results;
+        books_list.clear();
+        for (String key : results.keySet()) {
+            books_list.addElement(key);
+        }
+        number_of_results.setText("Nombres de livres dans cette catégorie = " + results.size()) ;
     }
 }

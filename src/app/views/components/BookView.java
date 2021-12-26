@@ -1,6 +1,6 @@
 package app.views.components;
 
-import app.views.components.Settings;
+import app.views.View;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -19,14 +19,17 @@ import static java.awt.event.MouseEvent.BUTTON3;
 public class BookView extends JPanel {
     private JEditorPane textHtml;
     private JScrollPane textWrapper;
-    private JButton backButton;
+    private JButton back_button;
     private JButton settingsButton;
     private JPopupMenu popupMenu;
     private JPanel toolbar;
     private JLabel currentBookTitle;
     private Settings settingsDialog;
+    private View view;
 
-    public BookView() throws IOException {
+    public BookView(View view) throws IOException {
+        this.view = view;
+
         // ===== Content components ======
         textWrapper = createTextWrapper();
         toolbar = createToolbar();
@@ -43,11 +46,17 @@ public class BookView extends JPanel {
     private JPanel createToolbar() throws IOException {
         // ===== Content components ======
         // Go back button
-        this.backButton = new JButton("Revenir en arrière");
-        this.backButton.setEnabled(true);
+        back_button = new JButton("Revenir en arrière");
+        back_button.setEnabled(true);
         Image backIcon = ImageIO.read(getClass().getResource("/app/assets/back.png"));
-        backButton.setIcon(new ImageIcon(backIcon));
-
+        back_button.setIcon(new ImageIcon(backIcon));
+        back_button.addActionListener(e -> {
+            try {
+                view.notify_back_performed();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
 
         // Settings button
         this.settingsButton = new JButton("Paramètres d'affichage");
@@ -62,21 +71,21 @@ public class BookView extends JPanel {
         // ===== Settings ======
         JPanel toolbar = new JPanel();
         toolbar.setLayout(new BoxLayout(toolbar, FlowLayout.RIGHT));
-        toolbar.setBorder(new CompoundBorder(BorderFactory.createMatteBorder(0, 0, 3, 0, new Color(128, 128, 128, 128)),
+        toolbar.setBorder(new CompoundBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(128, 128, 128, 128)),
                 BorderFactory.createEmptyBorder(10, 20, 10, 20)
         ));
 
         // Show the settings dialog when clicking on the settings button
         this.settingsButton.addActionListener(e -> {
             try {
-                this.settingsDialog = new Settings(this.getSize().width / 2, this.getSize().height / 2, this);
+                this.settingsDialog = new Settings(view, this.getSize().width / 2, this.getSize().height / 2, this);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
         });
 
         // ===== Content ======
-        toolbar.add(this.backButton);
+        toolbar.add(this.back_button);
         toolbar.add(Box.createHorizontalGlue());
         toolbar.add(this.currentBookTitle);
         toolbar.add(Box.createHorizontalGlue());
@@ -96,14 +105,6 @@ public class BookView extends JPanel {
         this.textHtml.setPreferredSize(new Dimension(500, 500));
 
         // ===== Content ======
-        try {
-            this.textHtml.setPage("https://www.gutenberg.org/files/67006/67006-h/67006-h.htm");
-        } catch (IOException e) {
-            e.printStackTrace();
-            this.textHtml.setText("<html>Page not found.</html>");
-        }
-
-
         JScrollPane textHtmlWrapper = new JScrollPane(this.textHtml);
         textHtmlWrapper.setMaximumSize(new Dimension(1280, 720));
         textHtmlWrapper.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 0));
@@ -165,5 +166,17 @@ public class BookView extends JPanel {
         });
 
         return popupMenu;
+    }
+
+    public void show_book(String title) {
+        // Set title
+        currentBookTitle.setText(title);
+
+        // Set text
+    }
+
+    public void change_font(String font, String fontSize) {
+        // Set font
+        this.textHtml.setFont(new Font(font, Font.PLAIN, Integer.parseInt(fontSize)));
     }
 }

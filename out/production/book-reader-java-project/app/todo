@@ -1,8 +1,44 @@
-Icons on tab titles
-Icon for the app itself
+- Tab acceuil pour afficher quelques conneries
+
+- Tab de recherche
+    - UI barre de recherche et resultats
+    - Implementer la recherche pour afficher les resultats
+    - Implementer les boutons livre pour lire ou telecharger
+
+- Tab librairie
+    - Afficher liste des livres en fonction de la catégorie choisie
+    - Implementer les boutons du livre pour lire ou telecharger
+
+- Modal de parametres
+    - Changer les parametres modifie le modele et les parametres
+
+- Vue livre
+    - Afficher le livre
+    - Implementer la pagination + bouton retour en arriere
+    - Implementer l'annotation
+    - Implementer le surlignage
+    - Implementer la definition de mot ?
+
+- Autre
+    - Telecharger livre en local
+    - Charger fichiers en local
+    - Sauvegarde des annotations et surlignages
+    - Sauvegarde de la position dans le livre
+
+- Rendre le code plus beau, plus lisible, plus structure, plus francais, plus commente
+
+- Rapport qui explique les implementations, les choix etc
+
+- 2 diagrammes UML
+
+- Mise sous forme jar et depot sur Moodle
 
 
-# Fonctionnalites supplementaires
-- livres favoris
-- stats de lecture
-- recherche
+
+
+
+
+
+
+
+

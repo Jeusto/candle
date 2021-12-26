@@ -1,16 +1,24 @@
 package app.views.components;
 
+import app.views.View;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 import java.io.IOException;
+import java.util.prefs.BackingStoreException;
 
 public class Settings extends JDialog {
     private JPanel selectionPanel;
     private JPanel buttonPanel;
+    private JComboBox<String> themeSelect;
+    private JComboBox<String> fontSelect;
+    private JComboBox<String> fontSizeSelect;
+    View view;
 
-    public Settings(int width, int height, JPanel parentPanel) throws IOException {
+    public Settings(View view, int width, int height, JPanel parentPanel) throws IOException {
+        this.view = view;
         // ===== Content components ======
         selectionPanel = createSelectionPanel(width, height);
         buttonPanel = createButtonPanel();
@@ -35,7 +43,7 @@ public class Settings extends JDialog {
         // ===== Content components ======
         // Theme selection
         JLabel themeSelectLabel = new JLabel("Choix du thème général");
-        JComboBox<String> themeSelect = new JComboBox<>();
+        themeSelect = new JComboBox<>();
         String[] themePossibleValues = {"Flat Light", "Flat Dark", "Flat Intellij", "Flat Darcula"};
         for (String themePossibleValue : themePossibleValues) {
             themeSelect.addItem(themePossibleValue);
@@ -43,7 +51,7 @@ public class Settings extends JDialog {
 
         // Font selection
         JLabel fontSelectLabel = new JLabel("Choix de la police d'écriture", SwingConstants.CENTER);
-        JComboBox<String> fontSelect = new JComboBox<>();
+        fontSelect = new JComboBox<>();
         String[] fontsPossibleValues = {"Arial", "Courier", "Helvetica", "Times New Roman", "Verdana"};
         for (String fontSize : fontsPossibleValues) {
             fontSelect.addItem(fontSize);
@@ -51,9 +59,9 @@ public class Settings extends JDialog {
 
         // Font size selection
         JLabel fontSizeLabel = new JLabel("Choisir la ta taille de la police");
-        JComboBox<Integer> fontSizeSelect = new JComboBox<>();
-        Integer[] fontSizePossibleValues = {8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72};
-        for (Integer fontSize : fontSizePossibleValues) {
+        fontSizeSelect = new JComboBox<>();
+        String[] fontSizePossibleValues = {"8", "9", "10", "11", "12", "14", "16", "18", "20", "22", "24", "26", "28", "36", "48", "72"};
+        for (String fontSize : fontSizePossibleValues) {
             fontSizeSelect.addItem(fontSize);
         }
 
@@ -77,11 +85,20 @@ public class Settings extends JDialog {
         JButton confirmButton = new JButton("Confirmer");
         Image confirmIcon = ImageIO.read(getClass().getResource("/app/assets/confirm.png"));
         confirmButton.setIcon(new ImageIcon(confirmIcon));
+        confirmButton.addActionListener(e -> {
+            try {
+                view.notify_settings_changed(themeSelect.getSelectedItem().toString(), fontSelect.getSelectedItem().toString(), fontSizeSelect.getSelectedItem().toString());
+                dispose();
+            } catch (BackingStoreException ex) {
+                ex.printStackTrace();
+            }
+        });
 
         // Cancel button
         JButton cancelButton = new JButton("Annuler");
         Image cancelIcon = ImageIO.read(getClass().getResource("/app/assets/cancel.png"));
         cancelButton.setIcon(new ImageIcon(cancelIcon));
+        cancelButton.addActionListener(e -> dispose());
 
         // ===== Settings ======
         JPanel buttonPanel = new JPanel();

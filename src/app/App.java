@@ -14,8 +14,7 @@ public class App {
         View view = new View();
 
         Controller controller = new Controller(view, model);
-        controller.setViewInitialState();
-        controller.showView();
+        controller.start();
     }
 
     public static void main(String[] args) {
