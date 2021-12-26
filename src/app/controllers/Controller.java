@@ -1,23 +1,29 @@
 package app.controllers;
 import app.models.Model;
-import app.views.MainView;
+import app.views.View;
 
-public class Controller {
-    private MainView mainView = null;
-    private Model model = null;
+public class Controller{
+    View view = null;
+    Model model = null;
 
-    public Controller(Model model) throws Exception {
+    public Controller(View view, Model model) throws Exception {
+        this.view = view;
         this.model = model;
-        Object settings = model.getSettings();
-        Object library = model.getLibrary();
-        this.mainView = new MainView(this, settings, library);
+
+        view.addController(this);
+        model.addChangeListener(this.view);
+    }
+
+
+    public void viewStateChanged() {
+        model.changeModelState();
+    }
+
+    public void setViewInitialState() throws Exception {
+        view.createContent(model.getCategories(), model.getLocalBooks(), model.getUserSettings());
     }
 
     public void showView() {
-        mainView.setVisible(true);
-    }
-
-    public void notifyStateChanged (Object settings, Object library) {
-        model.changeState(settings, library);
+        view.setVisible(true);
     }
 }

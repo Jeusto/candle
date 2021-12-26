@@ -1,93 +1,113 @@
 package app.views.tabs;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
+import java.io.IOException;
+import java.util.HashMap;
 
 
 public class Library extends JPanel {
     private JScrollPane leftPanel;
-    private JPanel rightPanel;
-
+    private JPanel mainPanel;
+    private HashMap<String, Integer> categoriesList;
     private DefaultMutableTreeNode[] categoryNodes;
-    private String currentCategoryTitle;
-    private int currentPage;
+    private JLabel currentCategory;
+    private JLabel currentPage;
+    private JButton nextPage;
+    private JButton prevPage;
 
-    public Library() throws Exception {
+    public Library(HashMap<String, Integer> categoriesList) throws Exception {
+        this.categoriesList = categoriesList;
+
+        // ===== Content components ======
+        leftPanel = createLeftPanel();
+        mainPanel = createMainPanel();
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, mainPanel);
+        splitPane.setOneTouchExpandable(true);
+        splitPane.setDividerSize(5);
+
+        // ===== Settings ======
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        // Create the left side of split panel: Categories tree
-        leftPanel = createLeftPanel();
-
-        // Create the right side of split panel: List of books
-        rightPanel = createRightPanel();
-
-        // Creat the split panel
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
-        splitPane.setOneTouchExpandable(false);
-        splitPane.setDividerSize(0);
+        // ===== Content ======
         add(splitPane);
     }
 
     private JScrollPane createLeftPanel() {
-        // Create the tree categories
+        // ===== Content components ======
+        // Tree structure
         DefaultMutableTreeNode node_all=new DefaultMutableTreeNode("Tous les livres");
-        DefaultMutableTreeNode node_available=new DefaultMutableTreeNode("Livres disponibles");
-        DefaultMutableTreeNode category_1=new DefaultMutableTreeNode("Animal");
-        DefaultMutableTreeNode category_2=new DefaultMutableTreeNode("Histoire");
-        DefaultMutableTreeNode category_3=new DefaultMutableTreeNode("Géographie");
+        DefaultMutableTreeNode node_available=new DefaultMutableTreeNode("Catégories disponibles");
+        DefaultMutableTreeNode node_read=new DefaultMutableTreeNode("Livres lus");
+        DefaultMutableTreeNode node_not_read=new DefaultMutableTreeNode("Livres non lus");
         DefaultMutableTreeNode node_downloaded=new DefaultMutableTreeNode("Livres téléchargés");
-        DefaultMutableTreeNode node_favorites=new DefaultMutableTreeNode("Favoris");
-        node_available.add(category_1); node_available.add(category_2); node_available.add(category_3);
-        node_all.add(node_available); node_all.add(node_downloaded); node_all.add(node_favorites);
-        for(int i=0;i<50;i++) {
-            node_available.add(new DefaultMutableTreeNode("Categorie "+i));
+        node_all.add(node_downloaded); node_all.add(node_read); node_all.add(node_not_read); node_all.add(node_available);
+
+        // Tree categories
+        for (String category : categoriesList.keySet()) {
+            node_available.add(new DefaultMutableTreeNode(category));
         }
 
-        // Create the tree
+        // Tree
         JTree tree = new JTree(node_all);
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
         tree.setRowHeight(0);
 
-        // Create the scroll pane that will contain the tree
+        // Tree selection listener
+        tree.addTreeSelectionListener(e -> {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+            if (node == null) {
+                return;
+            }
+            Object nodeInfo = node.getUserObject();
+            if (node.isLeaf()) {
+                currentCategory.setText(nodeInfo.toString());
+            }
+        });
+
+        // ===== Settings ======
         JScrollPane leftPane = new JScrollPane(tree);
-        leftPane.setPreferredSize(new Dimension(200, 0));
-        leftPane.setMinimumSize(new Dimension(150, 0));
-        leftPane.setMaximumSize(new Dimension(200, Short.MAX_VALUE));
+        leftPane.setPreferredSize(new Dimension(300, 0));
+        leftPane.setMinimumSize(new Dimension(235, 0));
+        leftPane.setMaximumSize(new Dimension(500, Short.MAX_VALUE));
         leftPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        leftPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         leftPane.setBorder(new EmptyBorder(0, 0, 0, 0));
 
         return leftPane;
     }
 
-    private JPanel createRightPanel() {
-        // Create the category title in the top of the panel
-        this.currentCategoryTitle = "Livres téléchargés";
-        JLabel categoryTitle = new JLabel(this.currentCategoryTitle);
-        categoryTitle.setFont((categoryTitle.getFont()).deriveFont(Font.PLAIN, 22 ));
-        categoryTitle.setPreferredSize(new Dimension(0, 50));
-        categoryTitle.setMinimumSize(new Dimension(0, 50));
-        categoryTitle.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
+    private JPanel createMainPanel() throws IOException {
+        // ===== Content components ======
+        // Category title
+        this.currentCategory = new JLabel("Livres téléchargés");
+        this.currentCategory.setFont((this.currentCategory.getFont()).deriveFont(Font.PLAIN, 22 ));
+        this.currentCategory.setPreferredSize(new Dimension(0, 50));
+        this.currentCategory.setMinimumSize(new Dimension(0, 50));
+        this.currentCategory.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
 
-        // Create the buttons in the top of the panel
+        // Top buttons
         JButton readButton = new JButton("Lire");
+        // add invisible border to avoid button overlap
+        Image readIcon = ImageIO.read(getClass().getResource("/app/assets/read.png"));
+        readButton.setIcon(new ImageIcon(readIcon));
         JButton downloadButton = new JButton("Télécharger");
-        JButton favoriteButton = new JButton("Favoris");
+        Image downloadIcon = ImageIO.read(getClass().getResource("/app/assets/download.png"));
+        downloadButton.setIcon(new ImageIcon(downloadIcon));
 
-        // Create the top part
+        // Top part that contains the category title and the top buttons
         JPanel top = new JPanel();
         top.setLayout(new BoxLayout(top, FlowLayout.RIGHT));
         top.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        top.add(categoryTitle);
+        top.add(this.currentCategory);
         top.add(readButton);
         top.add(downloadButton);
-        top.add(favoriteButton);
 
-        // Create the list of books in the center
+        // List of books in the center
         DefaultListModel<String> l1 = new DefaultListModel<>();
         for (int i = 0; i < 25; i++) {
             l1.addElement("Livre " + i);
@@ -100,34 +120,39 @@ public class Library extends JPanel {
         list.setFixedCellHeight(30);
         list.setFixedCellWidth(200);
 
-        // Create the scroll pane that will contain the list
+        // Scroll pane that contains the list
         JScrollPane center = new JScrollPane(list);
         center.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        // Create the bottom part with the page number and page change buttons
+        // Bottom part that contains the bottom buttons and page indicator
         JPanel bottom = new JPanel();
         bottom.setLayout(new BoxLayout(bottom, BoxLayout.X_AXIS));
         bottom.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        this.currentPage = 1;
-        bottom.add(new JLabel("Page " + this.currentPage));
+        this.currentPage = new JLabel("Page 1/43");
+        this.prevPage = new JButton("Précédent");
+        Image prevIcon = ImageIO.read(getClass().getResource("/app/assets/previous.png"));
+        prevPage.setIcon(new ImageIcon(prevIcon));
+        this.nextPage = new JButton("Suivant");
+        Image nextIcon = ImageIO.read(getClass().getResource("/app/assets/next.png"));
+        nextPage.setIcon(new ImageIcon(nextIcon));
+        bottom.add(currentPage);
         bottom.add(Box.createHorizontalGlue());
-        bottom.add(new JButton("<<"));
-        bottom.add(new JButton("<"));
-        bottom.add(new JButton(">"));
-        bottom.add(new JButton(">>"));
-        // make the buttons same size
-        bottom.setMaximumSize(new Dimension(Short.MAX_VALUE, bottom.getMaximumSize().height));
+        bottom.add(prevPage);
+        bottom.add(nextPage);
 
+        // ===== Settings ======
+        JPanel mainPanelWrapper = new JPanel();
+        mainPanelWrapper.setPreferredSize(new Dimension(800, 0));
+        mainPanelWrapper.setMinimumSize(new Dimension(500, 0));
+        mainPanelWrapper.setMaximumSize(new Dimension(1200, Short.MAX_VALUE));
+        mainPanelWrapper.setLayout(new BorderLayout());
+        mainPanelWrapper.setBorder(new EmptyBorder(10, 10, 10, 10));
+        
+        // ===== Content ======
+        mainPanelWrapper.add(top, BorderLayout.NORTH);
+        mainPanelWrapper.add(center, BorderLayout.CENTER);
+        mainPanelWrapper.add(bottom, BorderLayout.SOUTH);
 
-
-        // Create the panel that will contain everything
-        JPanel rightPanelWrapper = new JPanel();
-        rightPanelWrapper.setLayout(new BorderLayout());
-        rightPanelWrapper.setBorder(new EmptyBorder(10, 10, 10, 10));
-        rightPanelWrapper.add(top, BorderLayout.NORTH);
-        rightPanelWrapper.add(center, BorderLayout.CENTER);
-        rightPanelWrapper.add(bottom, BorderLayout.SOUTH);
-
-        return rightPanelWrapper;
+        return mainPanelWrapper;
     }
 }

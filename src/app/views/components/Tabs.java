@@ -4,21 +4,23 @@ import app.views.tabs.Home;
 import app.views.tabs.Library;
 import app.views.tabs.Search;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.util.HashMap;
 
 public class Tabs extends JTabbedPane {
-    public Tabs() throws Exception {
-        // Contenu
-        Home home_panel = new Home();
-        Library library_panel = new Library();
-        Search search_panel = new Search();
+    public Tabs(Home homeView, Search searchView, Library libraryView) throws Exception {
+        // ===== Content ======
+        Image homeIcon = ImageIO.read(getClass().getResource("/app/assets/home.png"));
+        Image searchIcon = ImageIO.read(getClass().getResource("/app/assets/search.png"));
+        Image libraryIcon = ImageIO.read(getClass().getResource("/app/assets/library.png"));
 
-        addTab("Accueil", home_panel);
-        addTab("Recherche", search_panel);
-        addTab("Ma bibliothèque", library_panel);
+        addTab("Accueil", new ImageIcon(homeIcon), homeView);
+        addTab("Recherche",new ImageIcon(searchIcon), searchView);
+        addTab("Ma bibliothèque", new ImageIcon(libraryIcon), libraryView);
 
-        // Reglages
+        // ===== Settings ======
         JTabbedPane tab = new JTabbedPane();
         Dimension newDim = new Dimension(50, 50);
 
