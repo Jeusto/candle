@@ -1,5 +1,6 @@
 package app.views.tabs;
 
+import app.models.entities.Book;
 import app.views.View;
 
 import javax.imageio.ImageIO;
@@ -7,6 +8,8 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,17 +21,17 @@ public class Library extends JPanel {
     private JPanel main_panel;
     private JList list;
     private DefaultListModel<String> books_list;
-    private HashMap<String, Integer> categories_list;
-    private HashMap<String, ArrayList<String>> current_category_books;
+    private app.models.entities.Library library;
+    private HashMap<String, Book> current_category_books;
     private DefaultMutableTreeNode[] category_nodes;
     private JLabel current_category;
     private JLabel number_of_results;
     private JButton nextPage;
     private JButton prevPage;
 
-    public Library(View view, HashMap<String, Integer> categoriesList) throws Exception {
+    public Library(View view, app.models.entities.Library library) throws Exception {
         this.view = view;
-        this.categories_list = categoriesList;
+        this.library = library;
 
         // ===== Content components ======
         left_panel = createLeftPanel();
@@ -48,21 +51,22 @@ public class Library extends JPanel {
     private JScrollPane createLeftPanel() {
         // ===== Content components ======
         // Tree structure
-        DefaultMutableTreeNode node_all=new DefaultMutableTreeNode("Tous les livres");
-        DefaultMutableTreeNode node_available=new DefaultMutableTreeNode("Catégories disponibles");
-        DefaultMutableTreeNode node_read=new DefaultMutableTreeNode("Livres lus");
-        DefaultMutableTreeNode node_not_read=new DefaultMutableTreeNode("Livres non lus");
-        DefaultMutableTreeNode node_downloaded=new DefaultMutableTreeNode("Livres téléchargés");
-        node_all.add(node_downloaded); node_all.add(node_read); node_all.add(node_not_read); node_all.add(node_available);
+        DefaultMutableTreeNode node_all = new DefaultMutableTreeNode("Tous les livres");
+        DefaultMutableTreeNode node_available = new DefaultMutableTreeNode("Catégories disponibles");
+        DefaultMutableTreeNode node_downloaded = new DefaultMutableTreeNode("Livres téléchargés");
+        node_all.add(node_downloaded);
+        node_all.add(node_available);
 
         // Tree categories
-        for (String category : categories_list.keySet()) {
+        for (String category : library.get_categories().keySet()) {
+            if (category.equals("Livres téléchargés")) continue;
             node_available.add(new DefaultMutableTreeNode(category));
         }
 
         // Tree
         JTree tree = new JTree(node_all);
         tree.setRootVisible(false);
+        tree.expandRow(1);
         tree.setShowsRootHandles(true);
         tree.setRowHeight(0);
 
@@ -98,7 +102,7 @@ public class Library extends JPanel {
         // ===== Content components ======
         // Category title
         this.current_category = new JLabel("Livres téléchargés");
-        this.current_category.setFont((this.current_category.getFont()).deriveFont(Font.PLAIN, 22 ));
+        this.current_category.setFont((this.current_category.getFont()).deriveFont(Font.PLAIN, 22));
         this.current_category.setPreferredSize(new Dimension(0, 50));
         this.current_category.setMinimumSize(new Dimension(0, 50));
         this.current_category.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
@@ -108,16 +112,34 @@ public class Library extends JPanel {
         Image readIcon = ImageIO.read(getClass().getResource("/app/assets/read.png"));
         read_button.setIcon(new ImageIcon(readIcon));
         read_button.addActionListener(e -> {
-            try {
-                view.notify_read_performed((String) list.getSelectedValue());
-            } catch (IOException ex) {
-                ex.printStackTrace();
+            if (list.getSelectedValue() == null) {
+                JOptionPane.showMessageDialog(this, "Il faut choisir un livre avant de cliquer sur \"télécharger!\"", "Erreur", JOptionPane.ERROR_MESSAGE);
+                return;
+            } else {
+                try {
+                    view.notify_read_performed(current_category.getText(), (String) list.getSelectedValue());
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
             }
         });
-        
+
         JButton downloadButton = new JButton("Télécharger");
         Image downloadIcon = ImageIO.read(getClass().getResource("/app/assets/download.png"));
         downloadButton.setIcon(new ImageIcon(downloadIcon));
+        downloadButton.addActionListener(e -> {
+            if (list.getSelectedValue() == null) {
+                // Show a joptionpane
+                JOptionPane.showMessageDialog(this, "Il faut choisir un livre avant de cliquer sur \"télécharger!\"", "Erreur", JOptionPane.ERROR_MESSAGE);
+                return;
+            } else {
+                try {
+                    view.notify_download_performed(current_category.getText(), (String) list.getSelectedValue());
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
 
         // Top part that contains the category title and the top buttons
         JPanel top = new JPanel();
@@ -137,6 +159,19 @@ public class Library extends JPanel {
         list.setVisibleRowCount(-1);
         list.setFixedCellHeight(30);
         list.setFixedCellWidth(200);
+
+        list.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                        try {
+                            view.notify_read_performed(current_category.getText(), (String) list.getSelectedValue());
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+            }
+        });
 
         // Scroll pane that contains the list
         JScrollPane center = new JScrollPane(list);
@@ -158,6 +193,7 @@ public class Library extends JPanel {
         bottom.add(number_of_results);
         bottom.add(Box.createHorizontalGlue());
         bottom.add(prevPage);
+        bottom.add(Box.createHorizontalStrut(10));
         bottom.add(nextPage);
 
         // ===== Settings ======
@@ -167,7 +203,7 @@ public class Library extends JPanel {
         mainPanelWrapper.setMaximumSize(new Dimension(1200, Short.MAX_VALUE));
         mainPanelWrapper.setLayout(new BorderLayout());
         mainPanelWrapper.setBorder(new EmptyBorder(10, 10, 10, 10));
-        
+
         // ===== Content ======
         mainPanelWrapper.add(top, BorderLayout.NORTH);
         mainPanelWrapper.add(center, BorderLayout.CENTER);
@@ -176,12 +212,15 @@ public class Library extends JPanel {
         return mainPanelWrapper;
     }
 
-    public void show_results(HashMap<String, ArrayList<String>> results) {
+    public void show_results(HashMap<String, Book> results) {
         current_category_books = results;
         books_list.clear();
         for (String key : results.keySet()) {
             books_list.addElement(key);
         }
-        number_of_results.setText("Nombres de livres dans cette catégorie = " + results.size()) ;
+        number_of_results.setText("Nombres de livres dans cette catégorie = " + results.size());
+    }
+
+    public void update_local_books() {
     }
 }

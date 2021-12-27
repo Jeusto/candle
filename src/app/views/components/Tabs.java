@@ -21,13 +21,6 @@ public class Tabs extends JTabbedPane {
         addTab("Ma bibliothèque", new ImageIcon(libraryIcon), libraryView);
 
         // ===== Settings ======
-        JTabbedPane tab = new JTabbedPane();
-        Dimension newDim = new Dimension(50, 50);
-
-        setMinimumSize(newDim);
-        setPreferredSize(newDim);
-        setMaximumSize(newDim);
-        setSize(newDim);
         revalidate();
     }
 }

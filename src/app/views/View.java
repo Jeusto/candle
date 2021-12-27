@@ -1,6 +1,7 @@
 package app.views;
 
 import app.controllers.Controller;
+import app.models.entities.Book;
 import app.views.components.BookView;
 import app.views.components.Tabs;
 import app.views.tabs.Home;
@@ -16,11 +17,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.prefs.BackingStoreException;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class View extends JFrame {
     private Controller controller;
-    private HashMap<String, Integer> categoriesList;
+    private app.models.entities.Library library_model;
     private HashMap<String, String> userSettings;
     private Tabs tabs_view;
     private BookView book_view;
@@ -29,6 +31,7 @@ public class View extends JFrame {
     private Search search_tab;
     private CardLayout card_layout;
     private JPanel main_panel;
+    private JPanel splash_screen;
 
 
     public View() {
@@ -44,14 +47,14 @@ public class View extends JFrame {
         this.controller = controller;
     }
 
-    public void create_view_content(HashMap<String, Integer> categoriesList, Object localBooks, HashMap<String, String> userSettings) throws Exception {
+    public void create_view_content(app.models.entities.Library library_model, HashMap<String, String> userSettings) throws Exception {
         // ===== Content ======
-        this.categoriesList = categoriesList;
+        this.library_model = library_model;
         this.userSettings = userSettings;
 
         home_tab = new Home();
         search_tab = new Search(this);
-        library_tab = new Library(this, categoriesList);
+        library_tab = new Library(this, library_model);
         tabs_view = new Tabs(home_tab, search_tab, library_tab);
         book_view = new BookView(this);
 
@@ -72,28 +75,24 @@ public class View extends JFrame {
         search_tab.show_results(results);
     }
 
-    public void notify_category_change_performed(String query) throws IOException {
-        controller.category_change_performed(query);
+    public void notify_category_change_performed(String category) throws IOException {
+        controller.category_change_performed(category);
     }
 
-    public void update_book_list_results(HashMap<String, ArrayList<String>> results) {
+    public void update_book_list_results(HashMap<String, Book> results) {
         library_tab.show_results(results);
     }
 
-    public void notify_read_performed(String book_title) throws IOException {
-        controller.read_button_clicked(book_title);
+    public void notify_read_performed(String category, String book_title) throws IOException {
+        controller.read_button_clicked(category, book_title);
     }
 
-    public void show_book_view(String current_book) {
+    public void show_book_view(Book current_book) {
         card_layout.next(main_panel);
         book_view.show_book(current_book);
     }
 
     public void notify_back_performed() throws IOException {
-        controller.back_button_clicked();
-    }
-
-    public void show_tabs_view() {
         card_layout.next(main_panel);
     }
 
@@ -101,19 +100,19 @@ public class View extends JFrame {
         controller.settings_changed(theme, font, fontSize);
     }
 
-    public void update_settings(HashMap<String, String> userSettings) {
+    public void update_settings(HashMap<String, String> settings) {
         // Change theme
         try {
-            if (userSettings.get("theme").equals("Flat Dark") && !this.userSettings.get("theme").equals("Flat Dark")) {
+            if (settings.get("theme").equals("Flat Dark") && !this.userSettings.get("theme").equals("Flat Dark")) {
                 UIManager.setLookAndFeel(new FlatDarkLaf());
             }
-            else if (userSettings.get("theme").equals("Flat Light") && !this.userSettings.get("theme").equals("Flat Light")) {
+            else if (settings.get("theme").equals("Flat Light") && !this.userSettings.get("theme").equals("Flat Light")) {
                 UIManager.setLookAndFeel(new FlatLightLaf());
             }
-            else if (userSettings.get("theme").equals("Flat Intellij") && !this.userSettings.get("theme").equals("Flat Intellij")) {
+            else if (settings.get("theme").equals("Flat Intellij") && !this.userSettings.get("theme").equals("Flat Intellij")) {
                 UIManager.setLookAndFeel(new FlatIntelliJLaf());
             }
-            else if (userSettings.get("theme").equals("Flat Darcula") && !this.userSettings.get("theme").equals("Flat Darcula")) {
+            else if (settings.get("theme").equals("Flat Darcula") && !this.userSettings.get("theme").equals("Flat Darcula")) {
                 UIManager.setLookAndFeel(new FlatDarculaLaf());
             }
         }
@@ -125,8 +124,16 @@ public class View extends JFrame {
         }
 
         // Change font
-        book_view.change_font(userSettings.get("font"), userSettings.get("fontSize"));
+        book_view.change_font(settings.get("font_family"), settings.get("font_size"));
 
-        this.userSettings = userSettings;
+        this.userSettings = settings;
+    }
+
+    public void notify_download_performed(String category, String title) throws IOException {
+        controller.download_button_clicked(category, title);
+    }
+
+    public void update_local_books() {
+        library_tab.update_local_books();
     }
 }

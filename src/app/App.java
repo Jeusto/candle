@@ -9,6 +9,10 @@ import javax.swing.*;
 
 public class App {
 
+    /**
+     * Cree et affiche l'application
+     * @throws Exception
+     */
     public static void createAndShowApp() throws Exception {
         Model model = new Model();
         View view = new View();
@@ -17,14 +21,18 @@ public class App {
         controller.start();
     }
 
+    /**
+     * Point d'entrée du programme
+     * @param args
+     */
     public static void main(String[] args) {
-        // Change the look and feel of the application
+        // Changer le theme visuel de l'interface graphique
         try {
             UIManager.setLookAndFeel(new FlatDarkLaf());
         } catch (Exception ex) {
             System.err.println("Une erreur est survenu lors du changement du thème visuel");
         }
-        // Create the application on the event dispatch thread
+        // Creer l'application et l'afficher
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 try {

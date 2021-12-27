@@ -1,5 +1,6 @@
 package app.views.components;
 
+import app.models.entities.Book;
 import app.views.View;
 
 import javax.imageio.ImageIO;
@@ -12,8 +13,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
-
 import static java.awt.event.MouseEvent.BUTTON3;
 
 public class BookView extends JPanel {
@@ -39,8 +40,8 @@ public class BookView extends JPanel {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         // ===== Content ======
-        add(this.toolbar);
-        add(this.textWrapper);
+        add(toolbar);
+        add(textWrapper);
     }
 
     private JPanel createToolbar() throws IOException {
@@ -59,14 +60,17 @@ public class BookView extends JPanel {
         });
 
         // Settings button
-        this.settingsButton = new JButton("Paramètres d'affichage");
-        this.settingsButton.setEnabled(true);
+        settingsButton = new JButton("Paramètres d'affichage");
+        settingsButton.setEnabled(true);
         Image settingsIcon = ImageIO.read(getClass().getResource("/app/assets/settings.png"));
         settingsButton.setIcon(new ImageIcon(settingsIcon));
 
         // Title
-        this.currentBookTitle = new JLabel("Titre du livre sera ici..");
+        currentBookTitle = new JLabel("Titre du livre", SwingConstants.CENTER);
         currentBookTitle.setFont((currentBookTitle.getFont()).deriveFont(Font.PLAIN, 22));
+        currentBookTitle.setPreferredSize(new Dimension(0, 27));
+        currentBookTitle.setMinimumSize(new Dimension(0, 27));
+        currentBookTitle.setMaximumSize(new Dimension(Short.MAX_VALUE*10, 27));
 
         // ===== Settings ======
         JPanel toolbar = new JPanel();
@@ -76,20 +80,20 @@ public class BookView extends JPanel {
         ));
 
         // Show the settings dialog when clicking on the settings button
-        this.settingsButton.addActionListener(e -> {
+        settingsButton.addActionListener(e -> {
             try {
-                this.settingsDialog = new Settings(view, this.getSize().width / 2, this.getSize().height / 2, this);
+                settingsDialog = new Settings(view, this.getSize().width / 2, this.getSize().height / 2, this);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
         });
 
         // ===== Content ======
-        toolbar.add(this.back_button);
+        toolbar.add(back_button);
         toolbar.add(Box.createHorizontalGlue());
-        toolbar.add(this.currentBookTitle);
+        toolbar.add(currentBookTitle);
         toolbar.add(Box.createHorizontalGlue());
-        toolbar.add(this.settingsButton);
+        toolbar.add(settingsButton);
 
         return toolbar;
     }
@@ -98,11 +102,11 @@ public class BookView extends JPanel {
         // ===== Content components ======
 
         // ===== Settings ======
-        this.textHtml = new JEditorPane();
-        this.textHtml.setEditable(false);
-        this.textHtml.setCursor(new Cursor(Cursor.TEXT_CURSOR));
-        this.textHtml.setContentType("text/html");
-        this.textHtml.setPreferredSize(new Dimension(500, 500));
+        textHtml = new JEditorPane();
+        textHtml.setEditable(false);
+        textHtml.setCursor(new Cursor(Cursor.TEXT_CURSOR));
+        textHtml.setContentType("text/html");
+        textHtml.setPreferredSize(new Dimension(500, 500));
 
         // ===== Content ======
         JScrollPane textHtmlWrapper = new JScrollPane(this.textHtml);
@@ -141,9 +145,9 @@ public class BookView extends JPanel {
 
         // Associate actions to menu items
         copyItem.addActionListener(e -> {
-            StringSelection selection = new StringSelection(this.textHtml.getText());
+            StringSelection stringSelection = new StringSelection(textHtml.getSelectedText());
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-            ((Clipboard) clipboard).setContents(selection, selection);
+            clipboard.setContents(stringSelection, null);
         });
 
         // Create the popup menu and add the menu items
@@ -168,15 +172,30 @@ public class BookView extends JPanel {
         return popupMenu;
     }
 
-    public void show_book(String title) {
+    public void show_book(Book book) {
         // Set title
-        currentBookTitle.setText(title);
+        currentBookTitle.setText(book.get_title());
 
         // Set text
+        if (book.is_downloaded()) {
+            try {
+                File file = new File(book.get_path());
+                this.textHtml.setPage(file.toURI().toURL());
+            } catch (IOException e) {
+                e.printStackTrace();
+                this.textHtml.setText("<html>Page not found.</html>");
+            }
+        } else {
+            try {
+                this.textHtml.setPage(book.get_path());
+            } catch (IOException e) {
+                e.printStackTrace();
+                this.textHtml.setText("<html>Page not found.</html>");
+            }
+        }
     }
 
     public void change_font(String font, String fontSize) {
-        // Set font
-        this.textHtml.setFont(new Font(font, Font.PLAIN, Integer.parseInt(fontSize)));
+        textHtml.setFont(new Font(font, Font.PLAIN, Integer.parseInt(fontSize)));
     }
 }
