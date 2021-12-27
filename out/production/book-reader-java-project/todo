@@ -1,0 +1,43 @@
+- Tab acceuil pour afficher quelques conneries
+
+- Tab de recherche
+    - UI barre de recherche et resultats
+    - Implementer la recherche pour afficher les resultats
+    - Implementer les boutons livre pour lire ou telecharger
+
+- Vue livre
+    - Implementer la pagination + bouton retour en arriere
+    - Implementer l'annotation
+    - Implementer le surlignage
+    - Implementer la definition de mot ?
+
+- Autre
+    - Sauvegarde des annotations et surlignages
+    - Sauvegarde de la position dans le livre
+    - Chaque livre a le meme format donc on peut et le livre commence apres un truc precis
+    - On peut stocker annotations te highlight au debut du fichier ?
+    - assertions
+    - faire le telechargement et operations lourdes en multi threading
+    - caracteres speciales mal affichees
+
+- Rendre le code plus beau, plus lisible, plus structure, plus francais, plus commente
+
+- Gerer tous les erreurs de la meme maniere et pas exit mais plutot afficher erreur et continuer!!
+
+- Rapport qui explique les implementations, les choix etc
+
+- 2 diagrammes UML
+
+- Tester le .jar sur d'autres pc
+
+- Mise sous forme jar et depot sur Moodle
+
+
+
+
+
+
+
+
+
+
