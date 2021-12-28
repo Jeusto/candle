@@ -78,12 +78,12 @@ public class View extends JFrame {
         presenter.category_change_performed(category);
     }
 
-    public void update_book_list_results(HashMap<String, Book> results) {
+    public void update_book_list_results(HashMap<Integer, Book> results) {
         library_tab.show_results(results);
     }
 
-    public void notify_read_performed(String category, String book_title) throws IOException, InterruptedException, BadLocationException {
-        presenter.read_button_clicked(category, book_title);
+    public void notify_read_performed(String category, Integer id) throws IOException, InterruptedException, BadLocationException {
+        presenter.read_button_clicked(category, id);
     }
 
     public void show_book_view(Book current_book) throws IOException, InterruptedException, BadLocationException {
@@ -91,12 +91,12 @@ public class View extends JFrame {
         book_view.show_book(current_book);
     }
 
-    public void notify_annotation_added(String category, String title, String annotation, Integer start, Integer end) throws IOException {
-        presenter.annotation_added(category, title, annotation, start, end);
+    public void notify_annotation_added(String category, Integer id, String annotation, Integer start, Integer end) throws IOException {
+        presenter.annotation_added(category, id, annotation, start, end);
     }
 
-    public void notify_delete_annotation(String category, String title, String annotation, Integer start, Integer end) throws IOException {
-        presenter.annotation_deleted(category, title, annotation, start, end);
+    public void notify_delete_annotation(String category, Integer id, String annotation, Integer start, Integer end) throws IOException {
+        presenter.annotation_deleted(category, id, annotation, start, end);
     }
 
     public void notify_back_performed() throws IOException {
@@ -136,12 +136,12 @@ public class View extends JFrame {
         this.userSettings = settings;
     }
 
-    public String notify_download_performed(String category, String title) throws IOException {
-        return presenter.download_button_clicked(category, title);
+    public String notify_download_performed(String category, Integer id) throws IOException {
+        return presenter.download_button_clicked(category, id);
     }
 
-    public String notify_delete_performed(String title) throws IOException {
-        return presenter.delete_button_clicked(title);
+    public String notify_delete_performed(Integer id) throws IOException {
+        return presenter.delete_button_clicked(id);
     }
 
     public String notify_definition_request(String selectedText) {

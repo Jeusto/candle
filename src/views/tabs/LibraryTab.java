@@ -8,8 +8,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.BadLocationException;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -25,7 +23,7 @@ public class LibraryTab extends JPanel {
     private JTree tree;
     private DefaultListModel<String> books_list;
     private models.entities.Library library;
-    private HashMap<String, Book> current_category_books;
+    private HashMap<String, Integer> current_category_books_list;
     private DefaultMutableTreeNode[] category_nodes;
     private JLabel current_category;
     private JLabel number_of_results;
@@ -35,6 +33,7 @@ public class LibraryTab extends JPanel {
     public LibraryTab(View view, models.entities.Library library) throws Exception {
         this.view = view;
         this.library = library;
+        this.current_category_books_list = new HashMap<>();
 
         // ===== Composants ======
         left_panel = createLeftPanel();
@@ -122,7 +121,7 @@ public class LibraryTab extends JPanel {
                 return;
             } else {
                 try {
-                    view.notify_read_performed(current_category.getText(), (String) list.getSelectedValue());
+                    view.notify_read_performed(current_category.getText(), current_category_books_list.get(list.getSelectedValue()));
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 } catch (InterruptedException ex) {
@@ -142,7 +141,7 @@ public class LibraryTab extends JPanel {
                 return;
             } else {
                 try {
-                    String result = view.notify_download_performed(current_category.getText(), (String) list.getSelectedValue());
+                    String result = view.notify_download_performed(current_category.getText(), current_category_books_list.get(list.getSelectedValue()));
                     JOptionPane.showMessageDialog(this, result, "Résultat du téléchargement", JOptionPane.INFORMATION_MESSAGE);
                 } catch (IOException ex) {
                     ex.printStackTrace();
@@ -159,7 +158,7 @@ public class LibraryTab extends JPanel {
                 return;
             } else {
                 try {
-                    String result = view.notify_delete_performed((String) list.getSelectedValue());
+                    String result = view.notify_delete_performed(current_category_books_list.get(list.getSelectedValue()));
                     JOptionPane.showMessageDialog(this, result, "Résultat de la suppression", JOptionPane.INFORMATION_MESSAGE);
                 } catch (IOException ex) {
                     ex.printStackTrace();
@@ -207,7 +206,7 @@ public class LibraryTab extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                         try {
-                            view.notify_read_performed(current_category.getText(), (String) list.getSelectedValue());
+                            view.notify_read_performed(current_category.getText(), current_category_books_list.get(list.getSelectedValue()));
                         } catch (IOException ex) {
                             ex.printStackTrace();
                         } catch (InterruptedException ex) {
@@ -258,11 +257,15 @@ public class LibraryTab extends JPanel {
         return mainPanelWrapper;
     }
 
-    public void show_results(HashMap<String, Book> results) {
-        current_category_books = results;
+    public void show_results(HashMap<Integer, Book> results) {
+        current_category_books_list = new HashMap<>();
         books_list.clear();
-        // Show results by alphabetical order
-        results.keySet().stream().sorted().forEach(book -> books_list.addElement(book));
+
+        // Show the results
+        for (Book book : results.values()) {
+            books_list.addElement(book.get_title());
+            current_category_books_list.put(book.get_title(), Integer.valueOf(book.get_id()));
+        }
         number_of_results.setText("Nombres de livres dans cette catégorie = " + results.size());
     }
 }

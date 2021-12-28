@@ -7,10 +7,6 @@ import javax.swing.*;
 
 public class App {
 
-    /**
-     * Cree et affiche l'application
-     * @throws Exception
-     */
     public static void createAndShowApp() throws Exception {
         Model model = new Model();
         View view = new View();
@@ -19,10 +15,6 @@ public class App {
         presenter.start();
     }
 
-    /**
-     * Point d'entrée du programme
-     * @param args
-     */
     public static void main(String[] args) {
         // Changer le theme visuel de l'interface graphique
         try {

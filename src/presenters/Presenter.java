@@ -44,8 +44,8 @@ public class Presenter {
         view.update_book_list_results(model.get_category_books(category));
     }
 
-    public void read_button_clicked(String category, String book_title) throws IOException, InterruptedException, BadLocationException {
-        view.show_book_view(model.get_book(category, book_title));
+    public void read_button_clicked(String category, Integer id) throws IOException, InterruptedException, BadLocationException {
+        view.show_book_view(model.get_book(category, id));
     }
 
     public void settings_changed(String theme, String font, String fontSize) throws BackingStoreException {
@@ -53,20 +53,20 @@ public class Presenter {
         view.update_settings(model.get_all_settings());
     }
 
-    public String download_button_clicked(String category, String title) throws IOException {
-        return model.download_book(category, title);
+    public String download_button_clicked(String category, Integer id) throws IOException {
+        return model.download_book(category, id);
     }
 
-    public String delete_button_clicked(String title) throws IOException {
-        return model.delete_book(title);
+    public String delete_button_clicked(Integer id) throws IOException {
+        return model.delete_book(id);
     }
 
-    public void annotation_added(String category, String title, String annotation, Integer start, Integer end) throws IOException {
-        model.annotation_added(category, title, annotation, start, end);
+    public void annotation_added(String category, Integer id, String annotation, Integer start, Integer end) throws IOException {
+        model.annotation_added(category, id, annotation, start, end);
     }
 
-    public void annotation_deleted(String category, String title, String annotation, Integer start, Integer end) {
-        model.annotation_deleted(category, title, annotation, start, end);
+    public void annotation_deleted(String category, Integer id, String annotation, Integer start, Integer end) {
+        model.annotation_deleted(category, id, annotation, start, end);
     }
 
     public String definition_request(String selectedText) {

@@ -62,12 +62,12 @@ public class Search {
                 JSONObject book_obj = (JSONObject) results_array.get(i);
                 JSONArray bookshelves = (JSONArray) book_obj.get("bookshelves");
                 if (bookshelves.size() > 0) {
-                    String title = (String) book_obj.get("title");
+                    Integer id = (Integer) book_obj.get("id");
                     String bookshelf = (String) bookshelves.get(0);
-                    System.out.println(title);
+                    System.out.println(id);
                     System.out.println(bookshelf);
 
-                    Book book = model.get_book(bookshelf, title);
+                    Book book = model.get_book(bookshelf, id);
 
                     if (book != null) {
                         book.get_image_url();

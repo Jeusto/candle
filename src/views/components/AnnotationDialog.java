@@ -12,16 +12,16 @@ public class AnnotationDialog extends JDialog implements Dialog {
     private JPanel buttonPanel;
     private JTextArea text_area;
     private String category;
-    private String book;
+    private Integer id;
     private Integer start;
     private Integer end;
     private BookView parentPanel;
     View view;
 
-    public AnnotationDialog(View view, int width, int height, BookView parentPanel, String category, String book, Integer start, Integer end) throws IOException {
+    public AnnotationDialog(View view, int width, int height, BookView parentPanel, String category, Integer id, Integer start, Integer end) throws IOException {
         this.view = view;
         this.category = category;
-        this.book = book;
+        this.id = id;
         this.start = start;
         this.end = end;
         this.parentPanel = parentPanel;
@@ -74,7 +74,7 @@ public class AnnotationDialog extends JDialog implements Dialog {
         confirmButton.setIcon(new ImageIcon(confirmIcon));
         confirmButton.addActionListener(e -> {
             try {
-                view.notify_annotation_added(category, book,  text_area.getText(), start, end);
+                view.notify_annotation_added(category, id, text_area.getText(), start, end);
                 parentPanel.show_highlights();
             } catch (IOException ex) {
                 ex.printStackTrace();

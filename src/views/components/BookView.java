@@ -187,6 +187,10 @@ public class BookView extends JPanel {
             int start = textHtml.getSelectionStart();
             int end = textHtml.getSelectionEnd();
 
+            if (book.is_downloaded() == false ) {
+                JOptionPane.showMessageDialog(this, "Il faut télécharger le livre avant de pouvoir ajouter des annotations.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             if (start - end == 0) {
                 JOptionPane.showMessageDialog(this, "Il faut sélectionner un texte pour l'annoter.", "Erreur", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -203,7 +207,7 @@ public class BookView extends JPanel {
             }
 
             try {
-                new AnnotationDialog(view, this.getSize().width / 2, this.getSize().height / 2, this, currentCategory, currentBookTitle.getText(), start, end);
+                new AnnotationDialog(view, this.getSize().width / 2, this.getSize().height / 2, this, currentCategory, book.get_id(), start, end);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -218,7 +222,7 @@ public class BookView extends JPanel {
                     Annotation a = annotations.get(h.getStartOffset());
                     if (a != null) {
                         try {
-                            view.notify_delete_annotation(currentCategory, currentBookTitle.getText(), a.get_text(), a.get_start(), a.get_start());
+                            view.notify_delete_annotation(currentCategory, book.get_id(), a.get_text(), a.get_start(), a.get_start());
                         } catch (IOException ex) {
                             ex.printStackTrace();
                         }

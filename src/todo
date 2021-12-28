@@ -3,7 +3,6 @@
 - Implementer la pagination/scroll (+ sauvegarder position)
 - Se souvenir des parametres et police et taille de police amelioree
 - Faire le telechargement et operations lourdes en multi threading (par exemple telechargement/delete: ne pas attendre le resultat de la fonction download, download se fais en backround puis appelle une fonction de view quand cest fini)
-- fixer annotation qui se supprime pas
 
 ================= Priorite 2 ====================================
 - Tab acceuil pour afficher quelques conneries
