@@ -66,39 +66,48 @@ public class Category {
                 }
             }
         }
-
     }
 
     private void load_remote_books() throws IOException {
-        // Else load the books
+
         String categoryUrl = "https://www.gutenberg.org/ebooks/bookshelf/" + id.toString();
+        while (true) {
+            // Connect to the URL
+            Document doc = Jsoup.connect(categoryUrl).get();
 
-        // Connect to the URL
-        Document doc = Jsoup.connect(categoryUrl).get();
+            // Get book titles
+            Elements titles = doc.select(".booklink a.link .title");
 
-        // Get book titles
-        Elements titles = doc.select(".booklink a.link .title");
+            // Get book IDs
+            Elements IDs = doc.select(".booklink > a");
+            ArrayList<String> idList = new ArrayList<String>();
+            for (Element ID : IDs) {
+                String id = ID.attr("href").substring(8);
+                idList.add(id);
+            }
 
-        // Get book IDs
-        Elements IDs = doc.select(".booklink > a");
-        ArrayList<String> idList = new ArrayList<String>();
-        for (Element ID : IDs) {
-            String id = ID.attr("href").substring(8);
-            idList.add(id);
-        }
+            // Get book links
+            Elements links = doc.select(".booklink a.link");
+            ArrayList<String> linkList = new ArrayList<String>();
+            for (Element link : links) {
+                linkList.add(link.attr("href"));
+            }
 
-        // Get book links
-        Elements links = doc.select(".booklink a.link");
-        ArrayList<String> linkList = new ArrayList<String>();
-        for (Element link : links) {
-            linkList.add(link.attr("href"));
-        }
+            // Add everything to hashmap
+            for (int i = 0; i < titles.size(); i++) {
+                String title = titles.get(i).text();
+                Book book = new Book(this.name, title, idList.get(i), null, false);
+                books.put(title, book);
+            }
 
-        // Add everything to hashmap
-        for (int i = 0; i < titles.size(); i++) {
-            String title = titles.get(i).text();
-            Book book = new Book(this.name, title, idList.get(i), null, false);
-            books.put(title, book);
+            // Check if a .links > [title] exists
+            Elements links_titles = doc.select(".links > a[accesskey^=\"+\"]");
+            if (links_titles.size() == 0) {
+                return;
+            }
+
+            String title = links_titles.get(0).attr("href");
+            categoryUrl = "https://www.gutenberg.org" + title;
         }
     }
 }

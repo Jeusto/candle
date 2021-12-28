@@ -4,6 +4,7 @@ import presenters.Presenter;
 import models.entities.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.prefs.BackingStoreException;
 
@@ -34,8 +35,8 @@ public class Model {
         return settings.get_all_settings();
     }
 
-    public String get_search_result(String query) {
-        return new Search(query).get_search_result();
+    public ArrayList<Book> get_search(String query) {
+        return Search.get_search(query, this);
     }
 
     public HashMap<String, Book> get_category_books(String category) {
@@ -43,16 +44,21 @@ public class Model {
     }
 
     public Book get_book(String category, String title) throws IOException {
-        return find_book(category, title).get_book();
+        System.out.println(title);
+        System.out.println(category);
+        get_category_books(category);
+        Book book = find_book(category, title).get_book();
+        System.out.println(book == null);
+        return book;
     }
 
     public String download_book(String category, String title) throws IOException {
         return find_book(category, title).download();
     }
 
-    public String delete_book(String category, String title) throws IOException {
-        String result = library.get_categories().get(category).get_books().get(title).delete();
-        library.get_categories().get(category).get_books().remove(title);
+    public String delete_book(String title) throws IOException {
+        String result = library.get_categories().get("Livres téléchargés").get_books().get(title).delete();
+        library.get_categories().get("Livres téléchargés").get_books().remove(title);
         return result;
     }
 
@@ -64,10 +70,21 @@ public class Model {
         find_book(category, title).delete_annotation(annotation, start, end);
     }
 
-    private Book find_book(String category,String title) {
+    private Book find_book(String category, String title) {
         return library.get_categories().get(category).get_books().get(title);
     }
 
+    private Book find_book(String title) {
+        for (Category category : library.get_categories().values()) {
+            if (category.get_books().containsKey(title)) {
+                return category.get_books().get(title);
+            }
+        }
+        return null;
+    }
 
+    public String get_definition(String selectedText) {
+        return Definition.get_definition(selectedText);
+    }
 }
 

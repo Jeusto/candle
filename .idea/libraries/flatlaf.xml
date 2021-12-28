@@ -3,6 +3,7 @@
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/flatlaf.jar!/" />
       <root url="jar://$PROJECT_DIR$/jsoup.jar!/" />
+      <root url="jar://$PROJECT_DIR$/json-simple.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

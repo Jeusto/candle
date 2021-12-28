@@ -8,6 +8,8 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.BadLocationException;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -59,10 +61,11 @@ public class LibraryTab extends JPanel {
         node_all.add(node_available);
 
         // Tree categories
-        for (String category : library.get_categories().keySet()) {
-            if (category.equals("Livres téléchargés")) continue;
+        library.get_categories().keySet().stream().sorted().forEach(category -> {
+            if (!category.equals("Livres téléchargés"))
             node_available.add(new DefaultMutableTreeNode(category));
-        }
+        });
+
 
         // Tree
         tree = new JTree(node_all);
@@ -88,6 +91,7 @@ public class LibraryTab extends JPanel {
             }
         });
 
+
         // ===== Parametres ======
         JScrollPane leftPane = new JScrollPane(tree);
         leftPane.setPreferredSize(new Dimension(300, 0));
@@ -102,7 +106,7 @@ public class LibraryTab extends JPanel {
     private JPanel createMainPanel() throws IOException {
         // ===== Composants ======
         // Category title
-        this.current_category = new JLabel("Livres téléchargés");
+        this.current_category = new JLabel("");
         this.current_category.setFont((this.current_category.getFont()).deriveFont(Font.PLAIN, 22));
         this.current_category.setPreferredSize(new Dimension(0, 50));
         this.current_category.setMinimumSize(new Dimension(0, 50));
@@ -114,7 +118,7 @@ public class LibraryTab extends JPanel {
         read_button.setIcon(new ImageIcon(readIcon));
         read_button.addActionListener(e -> {
             if (list.getSelectedValue() == null) {
-                JOptionPane.showMessageDialog(this, "Il faut choisir un livre avant de cliquer sur \"télécharger!\"", "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Il faut choisir un livre avant de cliquer sur \"lire\"!", "Erreur", JOptionPane.ERROR_MESSAGE);
                 return;
             } else {
                 try {
@@ -134,7 +138,7 @@ public class LibraryTab extends JPanel {
         downloadButton.setIcon(new ImageIcon(downloadIcon));
         downloadButton.addActionListener(e -> {
             if (list.getSelectedValue() == null) {
-                JOptionPane.showMessageDialog(this, "Il faut choisir un livre avant de cliquer sur \"télécharger!\"", "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Il faut choisir un livre avant de cliquer sur \"télécharger\"!", "Erreur", JOptionPane.ERROR_MESSAGE);
                 return;
             } else {
                 try {
@@ -151,11 +155,11 @@ public class LibraryTab extends JPanel {
         deleteButton.setIcon(new ImageIcon(deleteIcon));
         deleteButton.addActionListener(e -> {
             if (list.getSelectedValue() == null) {
-                JOptionPane.showMessageDialog(this, "Il faut choisir un livre avant de cliquer sur \"supprimer!\"", "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Il faut choisir un livre avant de cliquer sur \"supprimer\"!", "Erreur", JOptionPane.ERROR_MESSAGE);
                 return;
             } else {
                 try {
-                    String result = view.notify_delete_performed(current_category.getText(), (String) list.getSelectedValue());
+                    String result = view.notify_delete_performed((String) list.getSelectedValue());
                     JOptionPane.showMessageDialog(this, result, "Résultat de la suppression", JOptionPane.INFORMATION_MESSAGE);
                 } catch (IOException ex) {
                     ex.printStackTrace();
@@ -257,9 +261,8 @@ public class LibraryTab extends JPanel {
     public void show_results(HashMap<String, Book> results) {
         current_category_books = results;
         books_list.clear();
-        for (String key : results.keySet()) {
-            books_list.addElement(key);
-        }
+        // Show results by alphabetical order
+        results.keySet().stream().sorted().forEach(book -> books_list.addElement(book));
         number_of_results.setText("Nombres de livres dans cette catégorie = " + results.size());
     }
 }

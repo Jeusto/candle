@@ -1,52 +1,20 @@
-- Tab acceuil pour afficher quelques conneries
-
+================= Priorite 1 ====================================
 - Tab de recherche
-    - UI barre de recherche et resultats
-    - Implementer la recherche pour afficher les resultats
-    - Implementer les boutons livre pour lire ou telecharger
+- Implementer la pagination/scroll (+ sauvegarder position)
+- Se souvenir des parametres et police et taille de police amelioree
+- Faire le telechargement et operations lourdes en multi threading (par exemple telechargement/delete: ne pas attendre le resultat de la fonction download, download se fais en backround puis appelle une fonction de view quand cest fini)
+- fixer annotation qui se supprime pas
 
-- Vue livre
-    - Implementer la pagination + bouton retour en arriere
-    - Implementer l'annotation
-    - Implementer la definition de mot ?
+================= Priorite 2 ====================================
+- Tab acceuil pour afficher quelques conneries
+- Caracteres speciales mal affichees
 
-- Autre
-    - Sauvegarde des annotations
-    - Sauvegarde de la position dans le livre
-    - assertions
-    - faire le telechargement et operations lourdes en multi threading
-    - caracteres speciales mal affichees
+================= Ajrdhui mais pas difficile ====================
+- Rendre le code plus beau, plus lisible, plus structure, plus francais, plus commente (assertions par ex)
+- Gerer tous les erreurs de la meme maniere et pas exit mais plutot afficher erreur et continuer!
 
-- Rendre le code plus beau, plus lisible, plus structure, plus francais, plus commente
-
-- Gerer tous les erreurs de la meme maniere et pas exit mais plutot afficher erreur et continuer!!
-
+================= Dernier jour ==================================
 - Rapport qui explique les implementations, les choix etc
-
 - 2 diagrammes UML
-
 - Tester le .jar sur d'autres pc
-
 - Mise sous forme jar et depot sur Moodle
-
-
-
-
-
-
-            // set cursor at the end
-//            textHtml.setCaretPosition(textHtml.getDocument().getLength());
-//            System.out.println(textHtml.getText().split("\n").length);
-
-            System.out.println("line count: " + (textHtml.getDocument().getDefaultRootElement().getElementCount() - 1));
-            System.out.println("offset: " + textHtml.getDocument().getDefaultRootElement().getElement(textHtml.getDocument().getDefaultRootElement().getElementCount() - 1).getStartOffset());
-
-            textHtml.setCaretPosition(0);
-            textHtml.setCaretPosition(textHtml.getDocument().getDefaultRootElement().getElement(100).getStartOffset());
-
-            System.out.println(textHtml.getText().indexOf("Arnold"));
-
-            return;
-
-
-

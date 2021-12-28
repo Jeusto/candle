@@ -14,6 +14,7 @@ import com.formdev.flatlaf.FlatLightLaf;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.prefs.BackingStoreException;
 import javax.swing.*;
@@ -35,7 +36,6 @@ public class View extends JFrame {
 
     public View() {
         // ===== Parametres ======
-//        setLayout(new CardLayout());
         setTitle("Candle : an e-book reader");
         setMinimumSize(new Dimension(960, 540));
         setSize(1280, 720);
@@ -70,7 +70,7 @@ public class View extends JFrame {
         presenter.search_performed(query);
     }
 
-    public void update_search_results(String results) {
+    public void update_search_results(ArrayList<Book> results) throws IOException {
         search_tab.show_results(results);
     }
 
@@ -140,9 +140,11 @@ public class View extends JFrame {
         return presenter.download_button_clicked(category, title);
     }
 
-    public String notify_delete_performed(String category, String title) throws IOException {
-        return presenter.delete_button_clicked(category, title);
+    public String notify_delete_performed(String title) throws IOException {
+        return presenter.delete_button_clicked(title);
     }
 
-
+    public String notify_definition_request(String selectedText) {
+        return presenter.definition_request(selectedText);
+    }
 }

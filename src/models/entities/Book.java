@@ -1,15 +1,21 @@
 package models.entities;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Book {
@@ -18,6 +24,7 @@ public class Book {
     private String id;
     private Integer last_position;
     private HashMap<Integer, Annotation> annotations;
+    private String image_url;
     Boolean is_downloaded;
     String path;
 
@@ -38,26 +45,44 @@ public class Book {
             return "Ce livre est déjà téléchargé. Merci de réeassayer avec un autre livre.";
         }
 
-        // Telecharger le livre dans un fichier texte
-        InputStream in = new URL(path).openStream();
-        path = System.getProperty("user.home") + "/.candle-book-reader/" + title + ".txt";
-        Files.copy(in, Paths.get(path), StandardCopyOption.REPLACE_EXISTING);
+        // download the book from the url using utf8 encoding
+        URL url = new URL(path);
+        InputStream is = url.openStream();
+        BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
 
-        // Creer un deuxieme fichier pour stocker les annotations et la derniere position de lecture
-        File myObj = new File(System.getProperty("user.home") + "/.candle-book-reader/" + title + ".info");
-        // Write 0 to the file
+        // create a new file
+        path = System.getProperty("user.home") + "/.candle-book-reader/" + title + ".txt";
+        File file = new File(path);
+        file.createNewFile();
+
+        // write the content to the file
+        FileWriter fw = new FileWriter(file.getAbsoluteFile());
+        BufferedWriter bw = new BufferedWriter(fw);
+        String line;
+        while ((line = br.readLine()) != null) {
+            bw.write(line);
+            bw.newLine();
+        }
+
+
+        // Create json object
+        JSONObject json = new JSONObject();
+        json.put("last_position", 0);
+        json.put("annotations", new JSONArray());
+
+        // Write to file
+        File myObj = new File(System.getProperty("user.home") + "/.candle-book-reader/" + title + ".json");
         try {
             myObj.createNewFile();
-            FileWriter myWriter = new FileWriter(myObj);
-            BufferedWriter writer = new BufferedWriter(myWriter);
-            System.out.println("Writing to file");
-            writer.write("0");
-            writer.close();
-            myWriter.close();
         }
         catch (IOException e) {
             System.out.println("An error occurred.");
         }
+        FileWriter fileWriter = new FileWriter(path.substring(0, path.length() - 4) + ".json");
+
+        fileWriter.write(json.toJSONString());
+        fileWriter.close();
+
         is_downloaded = true;
 
         return "Le livre a été téléchargé.";
@@ -95,7 +120,6 @@ public class Book {
         Elements titles = doc.select("td > a");
 
         path = remote_path + "/" + titles.get(1).attr("href");
-        System.out.println(path);
     }
 
     public Book get_book() {
@@ -108,7 +132,7 @@ public class Book {
 
     public Integer get_last_position() throws FileNotFoundException {
         if (last_position == null) {
-            File info_file = new File(path.substring(0, path.length() - 4) + ".info");
+            File info_file = new File(path.substring(0, path.length() - 4) + ".json");
             if (info_file.exists()) {
                 last_position = Integer.parseInt(new Scanner(info_file).nextLine());
             }
@@ -119,42 +143,50 @@ public class Book {
     public void update_last_position() {}
 
     public void add_annotation(String annotation, Integer start, Integer end) {
-        System.out.println("Annotation added");
-        System.out.println(this);
-        System.out.println(annotation);
-        System.out.println(start);
-        System.out.println(end);
-        System.out.println(annotations == null);
+        String annotation_texte = annotation;
+        if (annotation_texte == null) { annotation_texte = " ";}
+        if (is_downloaded == false ) { return;}
 
-        // Write to file
+        // Update json
+        JSONObject json = new JSONObject();
+        json.put("last_position", 0);
+
+        JSONArray annotationsArray = new JSONArray();
+        annotations = load_annotations();
+        for (Annotation a : annotations.values()) {
+            JSONObject annotation_json = new JSONObject();
+            annotation_json.put("start", a.get_start());
+            annotation_json.put("end", a.get_end());
+            annotation_json.put("annotation", a.get_text() != null ? a.get_text() : " ");
+            annotationsArray.add(annotation_json);
+        }
+        // add new annotation
+        JSONObject annotation_json = new JSONObject();
+        annotation_json.put("start", start);
+        annotation_json.put("end", end);
+        annotation_json.put("annotation", annotation_texte);
+        annotationsArray.add(annotation_json);
+
+        json.put("annotations", annotationsArray);
+
         try {
-            FileWriter myWriter = new FileWriter(path.substring(0, path.length() - 4) + ".info", true);
-            BufferedWriter writer = new BufferedWriter(myWriter);
-            System.out.println("Writing to file");
-            writer.write(":::\n" + start + "\n" + end + "\n" + annotation + "\n");
-            writer.close();
-            myWriter.close();
+            FileWriter fileWriter = new FileWriter(path.substring(0, path.length() - 4) + ".json");
+            fileWriter.write(json.toJSONString());
+            fileWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         Annotation new_annotation = new Annotation(start, end, annotation);
         annotations = load_annotations();
         annotations.put(start, new_annotation);
     }
 
     public void delete_annotation(String annotation, Integer start, Integer end) {
-        System.out.println("Annotation deleted");
-        System.out.println(this);
-        System.out.println(annotation);
-        System.out.println(start);
-        System.out.println(end);
-        System.out.println(annotations == null);
-
         // Write to file
         try {
-            FileWriter myWriter = new FileWriter(path.substring(0, path.length() - 4) + ".info", true);
+            FileWriter myWriter = new FileWriter(path.substring(0, path.length() - 4) + ".json", true);
             BufferedWriter writer = new BufferedWriter(myWriter);
-            System.out.println("Removing from file");
             // Find the start and end of the annotation
             writer.close();
             myWriter.close();
@@ -166,45 +198,32 @@ public class Book {
     }
 
     public HashMap<Integer, Annotation> load_annotations(){
-        System.out.println("Annotations loaded");
-        System.out.println(this);
         if (annotations == null) {
             annotations = new HashMap<>();
         }
-        File info_file = new File(path.substring(0, path.length() - 4) + ".info");
-
-        Scanner scanner = null;
-        try {
-            scanner = new Scanner(info_file);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        File info_file = new File(path.substring(0, path.length() - 4) + ".json");
 
         if (info_file.exists()) {
-            last_position = Integer.parseInt(scanner.nextLine());
-            System.out.println(last_position);
-            // Read 1 line as int and then read as strin until ":::" is found
-            while (scanner.hasNextLine()) {
-                // Read 2 line as int
-                int start = Integer.parseInt(scanner.nextLine());
-                int end = Integer.parseInt(scanner.nextLine());
+            JSONParser parser = new JSONParser();
+            try {
+                JSONObject jsonObject = (JSONObject) parser.parse(new FileReader(info_file));
 
-                // Read as string until ":::" is found
-                // Store everythin between two ":::" as a string
-                String annotation = "";
-                while (scanner.hasNextLine()) {
-                    String line = scanner.nextLine();
-                    if (line.equals(":::")) {
-                        break;
-                    }
-                    annotation += line + "\n";
+                this.last_position = (Integer) jsonObject.get("last_start");
+
+                JSONArray annotationsArray = (JSONArray) jsonObject.get("annotations");
+                for (Object annotation : annotationsArray) {
+                    JSONObject annotation_object = (JSONObject) annotation;
+                    Long start = (Long) annotation_object.get("start");
+                    Long end = (Long) annotation_object.get("end");
+                    String text = (String) annotation_object.get("text");
+                    this.annotations.put(start.intValue(), new Annotation(start.intValue(), end.intValue(), text));
                 }
-                annotations.put(start, new Annotation(start, end, annotation));
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
 
-        System.out.println("load_annotations() retourne");
-        System.out.println(annotations == null);
         return annotations;
     }
 
@@ -212,4 +231,12 @@ public class Book {
         return category;
     }
 
+    private void setImage_url(String image_url) {
+        this.image_url = image_url;
+    }
+
+    public String get_image_url() {
+        this.image_url = "https://www.gutenberg.org/cache/epub/" + id + "/pg" + id + ".cover.medium.jpg";
+        return image_url;
+    }
 }

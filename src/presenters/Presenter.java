@@ -1,9 +1,11 @@
 package presenters;
 import models.Model;
+import models.entities.Book;
 import views.View;
 
 import javax.swing.text.BadLocationException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.prefs.BackingStoreException;
 
 public class Presenter {
@@ -35,7 +37,7 @@ public class Presenter {
     //
 
     public void search_performed(String query) throws IOException {
-        view.update_search_results(model.get_search_result(query));
+        view.update_search_results(model.get_search(query));
     }
 
     public void category_change_performed(String category) throws IOException {
@@ -55,8 +57,8 @@ public class Presenter {
         return model.download_book(category, title);
     }
 
-    public String delete_button_clicked(String category, String title) throws IOException {
-        return model.delete_book(category, title);
+    public String delete_button_clicked(String title) throws IOException {
+        return model.delete_book(title);
     }
 
     public void annotation_added(String category, String title, String annotation, Integer start, Integer end) throws IOException {
@@ -65,5 +67,9 @@ public class Presenter {
 
     public void annotation_deleted(String category, String title, String annotation, Integer start, Integer end) {
         model.annotation_deleted(category, title, annotation, start, end);
+    }
+
+    public String definition_request(String selectedText) {
+        return model.get_definition(selectedText);
     }
 }
