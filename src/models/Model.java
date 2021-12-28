@@ -1,7 +1,6 @@
 package models;
 
-import controllers.Controller;
-import models.entities.*;
+import presenters.Presenter;
 import models.entities.*;
 
 import java.io.IOException;
@@ -9,20 +8,18 @@ import java.util.HashMap;
 import java.util.prefs.BackingStoreException;
 
 public class Model {
+    private Presenter presenter;
     private Settings settings;
     private Library library;
-    private Category current_category;
-    private Book current_book;
 
-    private Controller controller;
 
     public Model() throws Exception {
         library = new Library();
         settings = new Settings();
     }
 
-    public void set_controller(Controller controller) {
-        this.controller = controller;
+    public void set_controller(Presenter presenter) {
+        this.presenter = presenter;
     }
 
     public Library get_library() {
@@ -45,18 +42,30 @@ public class Model {
         return library.get_categories().get(category).get_books();
     }
 
-    public Book get_book(String category, String book) throws IOException {
-        return library.get_categories().get(category).get_books().get(book).get_book();
+    public Book get_book(String category, String title) throws IOException {
+        return find_book(category, title).get_book();
     }
 
-    public String download_book(String category, String book) throws IOException {
-        return library.get_categories().get(category).get_books().get(book).download();
+    public String download_book(String category, String title) throws IOException {
+        return find_book(category, title).download();
     }
 
-    public String delete_book(String category, String book) throws IOException {
-        String result = library.get_categories().get(category).get_books().get(book).delete();
-        library.get_categories().get(category).get_books().remove(book);
+    public String delete_book(String category, String title) throws IOException {
+        String result = library.get_categories().get(category).get_books().get(title).delete();
+        library.get_categories().get(category).get_books().remove(title);
         return result;
+    }
+
+    public void annotation_added(String category, String title, String annotation, Integer start, Integer end) {
+        find_book(category, title).add_annotation(annotation, start, end);
+    }
+
+    public void annotation_deleted(String category, String title, String annotation, Integer start, Integer end) {
+        find_book(category, title).delete_annotation(annotation, start, end);
+    }
+
+    private Book find_book(String category,String title) {
+        return library.get_categories().get(category).get_books().get(title);
     }
 
 

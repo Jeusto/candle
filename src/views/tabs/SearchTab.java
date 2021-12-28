@@ -8,7 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 
-public class Search extends JPanel {
+public class SearchTab extends JPanel {
     private JPanel topPanel;
     private JPanel mainPanel;
     private View view;
@@ -16,23 +16,23 @@ public class Search extends JPanel {
     private JTextField search_field;
     private JLabel search_label;
 
-    public Search(View view) throws IOException {
+    public SearchTab(View view) throws IOException {
         this.view = view;
 
-        // ===== Content components ======
+        // ===== Composants ======
         topPanel = createTopPanel();
         mainPanel = createMainPanel();
 
-        // ===== Settings ======
+        // ===== Parametres ======
         setLayout(new BorderLayout());
 
-        // ===== Content ======
+        // ===== Contenu ======
         add(topPanel, BorderLayout.NORTH);
         add(mainPanel, BorderLayout.CENTER);
     }
 
     JPanel createTopPanel () throws IOException {
-        // ===== Content components ======
+        // ===== Composants ======
         // Search field
         search_field = new JTextField();
         search_field.setPreferredSize(new Dimension(200, 30));
@@ -50,12 +50,12 @@ public class Search extends JPanel {
             }
         });
 
-        // ===== Settings ======
+        // ===== Parametres ======
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, FlowLayout.RIGHT));
         topPanel.setBorder(BorderFactory.createEmptyBorder(20, 150, 20, 150));
 
-        // ===== Content ======
+        // ===== Contenu ======
         topPanel.add(search_field);
         topPanel.add(Box.createHorizontalStrut(10));
         topPanel.add(search_button);
@@ -63,17 +63,17 @@ public class Search extends JPanel {
     }
 
     JPanel createMainPanel () throws IOException {
-        // ===== Content components ======
+        // ===== Composants ======
         // Search word
         search_label = new JLabel("Le mot de recherche sera ici..");
         search_label.setFont((search_label.getFont()).deriveFont(Font.PLAIN, 22));
 
-        // ===== Settings ======
+        // ===== Parametres ======
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new FlowLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 20, 20));
 
-        // ===== Content ======
+        // ===== Contenu ======
         mainPanel.add(search_label);
         String[] links = {"https://www.gutenberg.org/cache/epub/66709/pg66709.cover.medium.jpg", "https://www.gutenberg.org/cache/epub/6130/pg6130.cover.medium.jpg", "https://www.gutenberg.org/cache/epub/64709/pg64709.cover.medium.jpg", "https://www.gutenberg.org/cache/epub/2852/pg2852.cover.medium.jpg", "https://www.gutenberg.org/cache/epub/2554/pg2554.cover.medium.jpg"};
         for (String link : links) {

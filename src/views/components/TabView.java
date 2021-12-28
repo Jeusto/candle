@@ -1,16 +1,16 @@
 package views.components;
 
-import views.tabs.Home;
-import views.tabs.Library;
-import views.tabs.Search;
+import views.tabs.HomeTab;
+import views.tabs.LibraryTab;
+import views.tabs.SearchTab;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 
-public class Tabs extends JTabbedPane {
-    public Tabs(Home homeView, Search searchView, Library libraryView) throws Exception {
-        // ===== Content ======
+public class TabView extends JTabbedPane {
+    public TabView(HomeTab homeView, SearchTab searchView, LibraryTab libraryView) throws Exception {
+        // ===== Contenu ======
         Image homeIcon = ImageIO.read(getClass().getResource("/assets/home.png"));
         Image searchIcon = ImageIO.read(getClass().getResource("/assets/search.png"));
         Image libraryIcon = ImageIO.read(getClass().getResource("/assets/library.png"));
@@ -19,7 +19,7 @@ public class Tabs extends JTabbedPane {
         addTab("Recherche",new ImageIcon(searchIcon), searchView);
         addTab("Ma bibliothèque", new ImageIcon(libraryIcon), libraryView);
 
-        // ===== Settings ======
+        // ===== Parametres ======
         revalidate();
     }
 }

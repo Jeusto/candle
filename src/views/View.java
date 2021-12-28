@@ -1,12 +1,12 @@
 package views;
 
-import controllers.Controller;
+import presenters.Presenter;
 import models.entities.Book;
 import views.components.BookView;
-import views.components.Tabs;
-import views.tabs.Home;
-import views.tabs.Library;
-import views.tabs.Search;
+import views.components.TabView;
+import views.tabs.HomeTab;
+import views.tabs.LibraryTab;
+import views.tabs.SearchTab;
 import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf;
@@ -20,21 +20,21 @@ import javax.swing.*;
 import javax.swing.text.BadLocationException;
 
 public class View extends JFrame {
-    private Controller controller;
+    private Presenter presenter;
     private models.entities.Library library_model;
     private HashMap<String, String> userSettings;
-    private Tabs tabs_view;
+    private TabView tabs_view;
     private BookView book_view;
-    private Home home_tab;
-    private Library library_tab;
-    private Search search_tab;
+    private HomeTab home_tab;
+    private LibraryTab library_tab;
+    private SearchTab search_tab;
     private CardLayout card_layout;
     private JPanel main_panel;
     private JPanel splash_screen;
 
 
     public View() {
-        // ===== Settings ======
+        // ===== Parametres ======
 //        setLayout(new CardLayout());
         setTitle("Candle : an e-book reader");
         setMinimumSize(new Dimension(960, 540));
@@ -42,19 +42,19 @@ public class View extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    public void set_controller(Controller controller) {
-        this.controller = controller;
+    public void set_controller(Presenter presenter) {
+        this.presenter = presenter;
     }
 
     public void create_view_content(models.entities.Library library_model, HashMap<String, String> userSettings) throws Exception {
-        // ===== Content ======
+        // ===== Contenu ======
         this.library_model = library_model;
         this.userSettings = userSettings;
 
-        home_tab = new Home();
-        search_tab = new Search(this);
-        library_tab = new Library(this, library_model);
-        tabs_view = new Tabs(home_tab, search_tab, library_tab);
+        home_tab = new HomeTab();
+        search_tab = new SearchTab(this);
+        library_tab = new LibraryTab(this, library_model);
+        tabs_view = new TabView(home_tab, search_tab, library_tab);
         book_view = new BookView(this);
 
         card_layout = new CardLayout();
@@ -67,7 +67,7 @@ public class View extends JFrame {
     }
 
     public void notify_search_performed(String query) throws IOException {
-        controller.search_performed(query);
+        presenter.search_performed(query);
     }
 
     public void update_search_results(String results) {
@@ -75,7 +75,7 @@ public class View extends JFrame {
     }
 
     public void notify_category_change_performed(String category) throws IOException {
-        controller.category_change_performed(category);
+        presenter.category_change_performed(category);
     }
 
     public void update_book_list_results(HashMap<String, Book> results) {
@@ -83,7 +83,7 @@ public class View extends JFrame {
     }
 
     public void notify_read_performed(String category, String book_title) throws IOException, InterruptedException, BadLocationException {
-        controller.read_button_clicked(category, book_title);
+        presenter.read_button_clicked(category, book_title);
     }
 
     public void show_book_view(Book current_book) throws IOException, InterruptedException, BadLocationException {
@@ -91,12 +91,20 @@ public class View extends JFrame {
         book_view.show_book(current_book);
     }
 
+    public void notify_annotation_added(String category, String title, String annotation, Integer start, Integer end) throws IOException {
+        presenter.annotation_added(category, title, annotation, start, end);
+    }
+
+    public void notify_delete_annotation(String category, String title, String annotation, Integer start, Integer end) throws IOException {
+        presenter.annotation_deleted(category, title, annotation, start, end);
+    }
+
     public void notify_back_performed() throws IOException {
         card_layout.next(main_panel);
     }
 
     public void notify_settings_changed(String theme, String font, String fontSize) throws BackingStoreException {
-        controller.settings_changed(theme, font, fontSize);
+        presenter.settings_changed(theme, font, fontSize);
     }
 
     public void update_settings(HashMap<String, String> settings) {
@@ -129,11 +137,12 @@ public class View extends JFrame {
     }
 
     public String notify_download_performed(String category, String title) throws IOException {
-        return controller.download_button_clicked(category, title);
+        return presenter.download_button_clicked(category, title);
     }
 
     public String notify_delete_performed(String category, String title) throws IOException {
-        return controller.delete_button_clicked(category, title);
+        return presenter.delete_button_clicked(category, title);
     }
+
 
 }

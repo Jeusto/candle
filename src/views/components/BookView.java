@@ -1,5 +1,6 @@
 package views.components;
 
+import models.entities.Annotation;
 import models.entities.Book;
 import views.View;
 
@@ -10,15 +11,12 @@ import javax.swing.text.*;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Scanner;
+import java.util.Map;
 
 import static java.awt.event.MouseEvent.BUTTON3;
 
@@ -29,65 +27,44 @@ public class BookView extends JPanel {
     private JButton settingsButton;
     private JPanel toolbar;
     private JLabel currentBookTitle;
+    private String currentCategory;
     private View view;
     private JPopupMenu popupMenu;
     private HashMap<Integer, Highlighter.Highlight> highlights;
     private Book book;
     private int lastMousePosition;
+    HashMap<Integer, Annotation> annotations;
 
     public BookView(View view) throws IOException {
         this.view = view;
 
-        // ===== Content components ======
+        // ===== Composants ======
         textHtmlWrapper = createTextWrapper();
         toolbar = createToolbar();
         popupMenu = createPopupMenu();
         highlights = new HashMap<>();
 
-        // ===== Settings ======
+        // ===== Parametres ======
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        // ===== Content ======
+        // ===== Contenu ======
         add(toolbar);
         add(textHtmlWrapper);
     }
 
-
-
-
-
-
-
-
-
-
-
     private JPanel createToolbar() throws IOException {
-        // ===== Content components ======
+        // ===== Composants ======
         // Go back button
         back_button = new JButton("Revenir en arrière");
         back_button.setEnabled(true);
         Image backIcon = ImageIO.read(getClass().getResource("/assets/back.png"));
         back_button.setIcon(new ImageIcon(backIcon));
         back_button.addActionListener(e -> {
-            // set cursor at the end
-//            textHtml.setCaretPosition(textHtml.getDocument().getLength());
-//            System.out.println(textHtml.getText().split("\n").length);
-
-            System.out.println("line count: " + (textHtml.getDocument().getDefaultRootElement().getElementCount() - 1));
-            System.out.println("offset: " + textHtml.getDocument().getDefaultRootElement().getElement(textHtml.getDocument().getDefaultRootElement().getElementCount() - 1).getStartOffset());
-
-            textHtml.setCaretPosition(0);
-            textHtml.setCaretPosition(textHtml.getDocument().getDefaultRootElement().getElement(100).getStartOffset());
-
-            System.out.println(textHtml.getText().indexOf("Arnold"));
-
-            return;
-//            try {
-//                view.notify_back_performed();
-//            } catch (IOException ex) {
-//                ex.printStackTrace();
-//            }
+            try {
+                view.notify_back_performed();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         });
 
         // Settings button
@@ -103,7 +80,7 @@ public class BookView extends JPanel {
         currentBookTitle.setMinimumSize(new Dimension(0, 27));
         currentBookTitle.setMaximumSize(new Dimension(Short.MAX_VALUE * 10, 27));
 
-        // ===== Settings ======
+        // ===== Parametres ======
         JPanel toolbar = new JPanel();
         toolbar.setLayout(new BoxLayout(toolbar, FlowLayout.RIGHT));
         toolbar.setBorder(new CompoundBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(128, 128, 128, 128)),
@@ -113,13 +90,13 @@ public class BookView extends JPanel {
         // Show the settings dialog when clicking on the settings button
         settingsButton.addActionListener(e -> {
             try {
-                new Settings(view, this.getSize().width / 2, this.getSize().height / 2, this);
+                new SettingsDialog(view, this.getSize().width / 2, this.getSize().height / 2, this);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
         });
 
-        // ===== Content ======
+        // ===== Contenu ======
         toolbar.add(back_button);
         toolbar.add(Box.createHorizontalGlue());
         toolbar.add(currentBookTitle);
@@ -130,9 +107,9 @@ public class BookView extends JPanel {
     }
 
     private JScrollPane createTextWrapper() {
-        // ===== Content components ======
+        // ===== Composants ======
 
-        // ===== Settings ======
+        // ===== Parametres ======
         textHtml = new JEditorPane();
         textHtml.setEditable(false);
         textHtml.setCursor(new Cursor(Cursor.TEXT_CURSOR));
@@ -141,7 +118,7 @@ public class BookView extends JPanel {
         textHtml.setBorder(BorderFactory.createEmptyBorder(0, 320, 0, 320));
         textHtml.setOpaque(false);
 
-        // ===== Content ======
+        // ===== Contenu ======
         textHtmlWrapper = new JScrollPane(textHtml);
         textHtmlWrapper.setMaximumSize(new Dimension(1280, 720));
         textHtmlWrapper.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 0));
@@ -156,18 +133,15 @@ public class BookView extends JPanel {
         JMenuItem copyItem = new JMenuItem("Copier");
         Image copyIcon = ImageIO.read(getClass().getResource("/assets/copy.png"));
         copyItem.setIcon(new ImageIcon(copyIcon));
-        JMenuItem annotateItem = new JMenuItem("Annotater");
+        JMenuItem viewAnnotateItem = new JMenuItem("Visualiser l'annotation");
+        Image viewAnnotateIcon = ImageIO.read(getClass().getResource("/assets/view.png"));
+        viewAnnotateItem.setIcon(new ImageIcon(viewAnnotateIcon));
+        JMenuItem annotateItem = new JMenuItem("Créer une annotation");
         Image noteIcon = ImageIO.read(getClass().getResource("/assets/note.png"));
         annotateItem.setIcon(new ImageIcon(noteIcon));
-        JMenuItem deleteAnnotateItem = new JMenuItem("Supprimer annotation");
+        JMenuItem deleteAnnotateItem = new JMenuItem("Supprimer l'annotation");
         Image deleteNoteIcon = ImageIO.read(getClass().getResource("/assets/remove.png"));
         deleteAnnotateItem.setIcon(new ImageIcon(deleteNoteIcon));
-        JMenuItem highlightItem = new JMenuItem("Surligner");
-        Image highlightIcon = ImageIO.read(getClass().getResource("/assets/highlight.png"));
-        highlightItem.setIcon(new ImageIcon(highlightIcon));
-        JMenuItem unhighlightItem = new JMenuItem("Supprimer surlignage");
-        Image unhighlightIcon = ImageIO.read(getClass().getResource("/assets/unhighlight.png"));
-        unhighlightItem.setIcon(new ImageIcon(unhighlightIcon));
         JMenuItem defineItem = new JMenuItem("Obtenir la définition");
         Image defineIcon = ImageIO.read(getClass().getResource("/assets/define.png"));
         defineItem.setIcon(new ImageIcon(defineIcon));
@@ -179,62 +153,51 @@ public class BookView extends JPanel {
             clipboard.setContents(stringSelection, null);
         });
 
-        highlightItem.addActionListener(e -> {
-            StringSelection stringSelection = new StringSelection(textHtml.getSelectedText());
-            int start = textHtml.getSelectionStart();
-            int end = textHtml.getSelectionEnd();
-            if (start - end == 0) {
-                JOptionPane.showMessageDialog(this, "Il faut sélectionner un texte pour le surligner", "Erreur", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            Highlighter highlighter = textHtml.getHighlighter();
-            DefaultHighlighter.DefaultHighlightPainter highlightPainter =
-                    new DefaultHighlighter.DefaultHighlightPainter(new Color(20, 150, 233, 60));
-            try {
-                highlighter.addHighlight(start, end,
-                        highlightPainter);
-            } catch (BadLocationException ex) {
-                ex.printStackTrace();
-            }
-            Highlighter.Highlight[] highlightIndex = highlighter.getHighlights();
-            highlights.put(start, highlightIndex[highlightIndex.length - 1]);
-            textHtml.setSelectionEnd(start);
-        });
-
-        unhighlightItem.addActionListener(e -> {
+        viewAnnotateItem.addActionListener(e -> {
             // On verifie si un surlignage qui passe par la position du curseur existe
             Highlighter highlighter = textHtml.getHighlighter();
             Highlighter.Highlight[] highlightIndex = highlighter.getHighlights();
-            for (Highlighter.Highlight h : highlightIndex) {
+            for (int i = 0; i < highlightIndex.length - 1 ; i++) {
+                Highlighter.Highlight h = highlightIndex[i];
                 System.out.println(h.getStartOffset() + " " + h.getEndOffset());
                 if (h.getStartOffset() <= lastMousePosition && h.getEndOffset() >= lastMousePosition) {
-                    highlighter.removeHighlight(h);
+                    System.out.println("Highlight found");
+                    JOptionPane.showMessageDialog(this, annotations.get(h.getStartOffset()).get_text(), "Annotation", JOptionPane.INFORMATION_MESSAGE);
                     return;
                 }
             }
-            JOptionPane.showMessageDialog(this, "Aucun surlignage n'est sélectionné", "Erreur", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Aucune annotation n'est sélectionné.", "Erreur", JOptionPane.ERROR_MESSAGE);
         });
 
         annotateItem.addActionListener(e -> {
             StringSelection stringSelection = new StringSelection(textHtml.getSelectedText());
             int start = textHtml.getSelectionStart();
             int end = textHtml.getSelectionEnd();
+
+            System.out.println("start = " + start + "/ end = " + end);
             if (start - end == 0) {
-                JOptionPane.showMessageDialog(this, "Il faut sélectionner un texte pour le surligner", "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Il faut sélectionner un texte pour l'annoter.", "Erreur", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+            // Verifier si le texte est déjà annoté
             Highlighter highlighter = textHtml.getHighlighter();
-            DefaultHighlighter.DefaultHighlightPainter highlightPainter =
-                    new DefaultHighlighter.DefaultHighlightPainter(new Color(220, 40, 50, 60));
+            Highlighter.Highlight[] highlightIndex = highlighter.getHighlights();
+            for (int i = 0; i < highlightIndex.length - 1 ; i++) {
+                Highlighter.Highlight h = highlightIndex[i];
+                System.out.println("la");
+                System.out.println(h.getStartOffset() + " " + h.getEndOffset());
+                if ((start <= h.getStartOffset() && end  >= h.getStartOffset()) || (start <= h.getEndOffset() && end  >= h.getEndOffset()) || (start >= h.getStartOffset() && end <= h.getEndOffset())) {
+                    System.out.println("la2");
+                    JOptionPane.showMessageDialog(this, "Il y a déjà une annotation à la position choisie.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            }
+
             try {
-                highlighter.addHighlight(start, end,
-                        highlightPainter);
-            } catch (BadLocationException ex) {
+                new AnnotationDialog(view, this.getSize().width / 2, this.getSize().height / 2, this, currentCategory, currentBookTitle.getText(), start, end);
+            } catch (IOException ex) {
                 ex.printStackTrace();
             }
-            Highlighter.Highlight[] highlightIndex = highlighter.getHighlights();
-            highlights.put(start, highlightIndex[highlightIndex.length - 1]);
-            textHtml.setSelectionEnd(start);
         });
 
         deleteAnnotateItem.addActionListener(e -> {
@@ -244,19 +207,20 @@ public class BookView extends JPanel {
             for (Highlighter.Highlight h : highlightIndex) {
                 System.out.println(h.getStartOffset() + " " + h.getEndOffset());
                 if (h.getStartOffset() <= lastMousePosition && h.getEndOffset() >= lastMousePosition) {
+                    Annotation a = annotations.get(h.getStartOffset());
+                    view.notify_delete_annotation(currentCategory, currentBookTitle.getText(), a.get_text(), a.get_start(), a.get_start());
                     highlighter.removeHighlight(h);
                     return;
                 }
             }
-            JOptionPane.showMessageDialog(this, "Aucun surlignage n'est sélectionné", "Erreur", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Il faut sélectionner un texte pour le supprimer.", "Erreur", JOptionPane.ERROR_MESSAGE);
         });
 
         // Create the popup menu and add the menu items
         JPopupMenu popupMenu = new JPopupMenu();
         popupMenu.add(copyItem);
         popupMenu.addSeparator();
-        popupMenu.add(highlightItem);
-        popupMenu.add(unhighlightItem);
+        popupMenu.add(viewAnnotateItem);
         popupMenu.add(annotateItem);
         popupMenu.add(deleteAnnotateItem);
         popupMenu.addSeparator();
@@ -278,10 +242,20 @@ public class BookView extends JPanel {
         return popupMenu;
     }
 
+    private boolean two_intervals_overlap (int start1, int end1, int start2, int end2) {
+        return (start1 <= start2 && end1 >= start2) || (start1 <= end2 && end1 >= end2) || (start1 >= start2 && end1 <= end2);
+    }
     public void show_book(Book book) throws IOException, InterruptedException, BadLocationException {
-        // Set title
+        // Si on a un livre en mémoire et qu'on veut réafficher le même livre, on a pas besoin de charger le fichier
+        if (this.book != null && book.get_title().equals(this.book.get_title())) {
+            return;
+        }
+
+        // Set title and category
         currentBookTitle.setText(book.get_title());
-        System.out.println(book.get_path());
+        currentCategory = book.get_category();
+        String path = book.get_path();
+        this.book = book;
 
         // Set text
         if (book.is_downloaded()) {
@@ -290,15 +264,41 @@ public class BookView extends JPanel {
                 textHtml.setPage(file.toURI().toURL());
             } catch (IOException e) {
                 e.printStackTrace();
-                this.textHtml.setText("<html>Livre non trouvé. Merci de réessayer avec un autre.</html>");
+                this.textHtml.setText("<html>Fichier local du livre non trouvé. Merci de réessayer avec un autre.</html>");
             }
         } else {
             try {
                 this.textHtml.setPage(book.get_path());
             } catch (IOException e) {
                 e.printStackTrace();
-                this.textHtml.setText("<html>Livre non trouvé. Merci de réessayer avec un autre.</html>");
+                this.textHtml.setText("<html>Fichier distant du livre non trouvé. Merci de réessayer avec un autre.</html>");
             }
+        }
+
+        // Charger les annotations
+        show_highlights();
+    }
+
+    public void show_highlights() {
+        // Charger les annotations
+        annotations = new HashMap<>();
+        annotations = book.load_annotations();
+        textHtml.getHighlighter().removeAllHighlights();
+
+        // Ajouter un surlignage pour chaque annotation
+        for (Map.Entry<Integer, Annotation> entry : annotations.entrySet()) {
+            Annotation annotation = entry.getValue();
+            Highlighter highlighter = textHtml.getHighlighter();
+            DefaultHighlighter.DefaultHighlightPainter highlightPainter =
+                    new DefaultHighlighter.DefaultHighlightPainter(new Color(20, 150, 233, 60));
+            try {
+                highlighter.addHighlight(annotation.get_start(), annotation.get_end(),
+                        highlightPainter);
+            } catch (BadLocationException ex) {
+                ex.printStackTrace();
+            }
+            Highlighter.Highlight[] highlightIndex = highlighter.getHighlights();
+            highlights.put(annotation.get_start(), highlightIndex[highlightIndex.length - 1]);
         }
     }
 

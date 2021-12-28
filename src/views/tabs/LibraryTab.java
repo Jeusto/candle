@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 
-public class Library extends JPanel {
+public class LibraryTab extends JPanel {
     private View view;
     private JScrollPane left_panel;
     private JPanel main_panel;
@@ -30,11 +30,11 @@ public class Library extends JPanel {
     private JButton nextPage;
     private JButton prevPage;
 
-    public Library(View view, models.entities.Library library) throws Exception {
+    public LibraryTab(View view, models.entities.Library library) throws Exception {
         this.view = view;
         this.library = library;
 
-        // ===== Content components ======
+        // ===== Composants ======
         left_panel = createLeftPanel();
         main_panel = createMainPanel();
 
@@ -42,15 +42,15 @@ public class Library extends JPanel {
         splitPane.setOneTouchExpandable(true);
         splitPane.setDividerSize(5);
 
-        // ===== Settings ======
+        // ===== Parametres ======
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        // ===== Content ======
+        // ===== Contenu ======
         add(splitPane);
     }
 
     private JScrollPane createLeftPanel() {
-        // ===== Content components ======
+        // ===== Composants ======
         // Tree structure
         DefaultMutableTreeNode node_all = new DefaultMutableTreeNode("Tous les livres");
         DefaultMutableTreeNode node_available = new DefaultMutableTreeNode("Catégories disponibles");
@@ -88,7 +88,7 @@ public class Library extends JPanel {
             }
         });
 
-        // ===== Settings ======
+        // ===== Parametres ======
         JScrollPane leftPane = new JScrollPane(tree);
         leftPane.setPreferredSize(new Dimension(300, 0));
         leftPane.setMinimumSize(new Dimension(235, 0));
@@ -100,7 +100,7 @@ public class Library extends JPanel {
     }
 
     private JPanel createMainPanel() throws IOException {
-        // ===== Content components ======
+        // ===== Composants ======
         // Category title
         this.current_category = new JLabel("Livres téléchargés");
         this.current_category.setFont((this.current_category.getFont()).deriveFont(Font.PLAIN, 22));
@@ -238,7 +238,7 @@ public class Library extends JPanel {
         bottom.add(Box.createHorizontalStrut(10));
         bottom.add(nextPage);
 
-        // ===== Settings ======
+        // ===== Parametres ======
         JPanel mainPanelWrapper = new JPanel();
         mainPanelWrapper.setPreferredSize(new Dimension(800, 0));
         mainPanelWrapper.setMinimumSize(new Dimension(500, 0));
@@ -246,7 +246,7 @@ public class Library extends JPanel {
         mainPanelWrapper.setLayout(new BorderLayout());
         mainPanelWrapper.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        // ===== Content ======
+        // ===== Contenu ======
         mainPanelWrapper.add(top, BorderLayout.NORTH);
         mainPanelWrapper.add(center, BorderLayout.CENTER);
         mainPanelWrapper.add(bottom, BorderLayout.SOUTH);

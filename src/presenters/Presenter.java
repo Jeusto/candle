@@ -1,4 +1,4 @@
-package controllers;
+package presenters;
 import models.Model;
 import views.View;
 
@@ -6,11 +6,11 @@ import javax.swing.text.BadLocationException;
 import java.io.IOException;
 import java.util.prefs.BackingStoreException;
 
-public class Controller{
+public class Presenter {
     View view = null;
     Model model = null;
 
-    public Controller(View view, Model model) throws Exception {
+    public Presenter(View view, Model model) throws Exception {
         this.view = view;
         this.model = model;
 
@@ -57,5 +57,13 @@ public class Controller{
 
     public String delete_button_clicked(String category, String title) throws IOException {
         return model.delete_book(category, title);
+    }
+
+    public void annotation_added(String category, String title, String annotation, Integer start, Integer end) throws IOException {
+        model.annotation_added(category, title, annotation, start, end);
+    }
+
+    public void annotation_deleted(String category, String title, String annotation, Integer start, Integer end) {
+        model.annotation_deleted(category, title, annotation, start, end);
     }
 }

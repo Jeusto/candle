@@ -8,14 +8,11 @@
 - Vue livre
     - Implementer la pagination + bouton retour en arriere
     - Implementer l'annotation
-    - Implementer le surlignage
     - Implementer la definition de mot ?
 
 - Autre
-    - Sauvegarde des annotations et surlignages
+    - Sauvegarde des annotations
     - Sauvegarde de la position dans le livre
-    - Chaque livre a le meme format donc on peut et le livre commence apres un truc precis
-    - On peut stocker annotations te highlight au debut du fichier ?
     - assertions
     - faire le telechargement et operations lourdes en multi threading
     - caracteres speciales mal affichees
@@ -37,7 +34,19 @@
 
 
 
+            // set cursor at the end
+//            textHtml.setCaretPosition(textHtml.getDocument().getLength());
+//            System.out.println(textHtml.getText().split("\n").length);
 
+            System.out.println("line count: " + (textHtml.getDocument().getDefaultRootElement().getElementCount() - 1));
+            System.out.println("offset: " + textHtml.getDocument().getDefaultRootElement().getElement(textHtml.getDocument().getDefaultRootElement().getElementCount() - 1).getStartOffset());
+
+            textHtml.setCaretPosition(0);
+            textHtml.setCaretPosition(textHtml.getDocument().getDefaultRootElement().getElement(100).getStartOffset());
+
+            System.out.println(textHtml.getText().indexOf("Arnold"));
+
+            return;
 
 
 

@@ -8,21 +8,21 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.prefs.BackingStoreException;
 
-public class Settings extends JDialog {
-    private JPanel selectionPanel;
+public class SettingsDialog extends JDialog implements Dialog {
+    private JPanel topPanel;
     private JPanel buttonPanel;
     private JComboBox<String> themeSelect;
     private JComboBox<String> fontSelect;
     private JComboBox<String> fontSizeSelect;
     View view;
 
-    public Settings(View view, int width, int height, JPanel parentPanel) throws IOException {
+    public SettingsDialog(View view, int width, int height, JPanel parentPanel) throws IOException {
         this.view = view;
-        // ===== Content components ======
-        selectionPanel = createSelectionPanel(width, height);
-        buttonPanel = createButtonPanel();
+        // ===== Composants ======
+        topPanel = create_top_panel(width, height);
+        buttonPanel = create_bottom_panel();
 
-        // ===== Settings ======
+        // ===== Parametres ======
         setTitle("Paramètres d'affichage");
         setSize(500, 300);
         setLocationRelativeTo(parentPanel);
@@ -31,15 +31,15 @@ public class Settings extends JDialog {
         setLayout(new BorderLayout());
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        // ===== Content ======
-        add(selectionPanel, BorderLayout.CENTER);
+        // ===== Contenu ======
+        add(topPanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
 
         setVisible(true);
     }
 
-    JPanel createSelectionPanel (int width, int height) throws IOException {
-        // ===== Content components ======
+    public JPanel create_top_panel(int width, int height) throws IOException {
+        // ===== Composants ======
         // Theme selection
         JLabel themeSelectLabel = new JLabel("Choix du thème général");
         themeSelect = new JComboBox<>();
@@ -64,13 +64,13 @@ public class Settings extends JDialog {
             fontSizeSelect.addItem(fontSize);
         }
 
-        // ===== Settings ======
+        // ===== Parametres ======
         JPanel selectionPanel = new JPanel();
         selectionPanel.setLayout(new BoxLayout(selectionPanel, BoxLayout.Y_AXIS));
         selectionPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
         selectionPanel.setMaximumSize(new Dimension(width, height));
 
-        // ===== Content ======
+        // ===== Contenu ======
         selectionPanel.add(themeSelectLabel); selectionPanel.add(themeSelect); selectionPanel.add(Box.createVerticalStrut(20));
         selectionPanel.add(fontSelectLabel); selectionPanel.add(fontSelect); selectionPanel.add(Box.createVerticalStrut(20));
         selectionPanel.add(fontSizeLabel); selectionPanel.add(fontSizeSelect); selectionPanel.add(Box.createVerticalStrut(20));
@@ -78,8 +78,8 @@ public class Settings extends JDialog {
         return selectionPanel;
     }
 
-    JPanel createButtonPanel () throws IOException {
-        // ===== Content components ======
+    public JPanel create_bottom_panel() throws IOException {
+        // ===== Composants ======
         // Confirm button
         JButton confirmButton = new JButton("Confirmer");
         Image confirmIcon = ImageIO.read(getClass().getResource("/assets/confirm.png"));
@@ -99,11 +99,11 @@ public class Settings extends JDialog {
         cancelButton.setIcon(new ImageIcon(cancelIcon));
         cancelButton.addActionListener(e -> dispose());
 
-        // ===== Settings ======
+        // ===== Parametres ======
         JPanel buttonPanel = new JPanel();
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 200, 20, 10));
 
-        // ===== Content ======
+        // ===== Contenu ======
         buttonPanel.add(Box.createHorizontalGlue());
         buttonPanel.add(Box.createHorizontalGlue());
         buttonPanel.add(confirmButton);

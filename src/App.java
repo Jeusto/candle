@@ -1,4 +1,4 @@
-import controllers.Controller;
+import presenters.Presenter;
 import models.Model;
 import views.View;
 import com.formdev.flatlaf.FlatDarkLaf;
@@ -15,8 +15,8 @@ public class App {
         Model model = new Model();
         View view = new View();
 
-        Controller controller = new Controller(view, model);
-        controller.start();
+        Presenter presenter = new Presenter(view, model);
+        presenter.start();
     }
 
     /**

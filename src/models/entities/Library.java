@@ -56,17 +56,13 @@ public class Library {
 
     public void create_local_bookshelves() {
         // Create app directory if it doesn't exist
-        File appDir = new File(System.getProperty("user.home") + "/.candle-book-reader");
-        if (!appDir.exists()) {
-            appDir.mkdir();
+        File app_directory = new File(System.getProperty("user.home") + "/.candle-book-reader");
+        if (!app_directory.exists()) {
+            app_directory.mkdir();
         }
 
         // Load local books
-        Category localCategory = new Category("Local", -1, true);
+        Category localCategory = new Category("Livres téléchargés", -1, true);
         categories.put("Livres téléchargés", localCategory);
-    }
-
-    public Book search_book(String category_name, String book_title) {
-        return categories.get(category_name).get_books().get(book_title);
     }
 }

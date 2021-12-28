@@ -98,7 +98,6 @@ public class Category {
         for (int i = 0; i < titles.size(); i++) {
             String title = titles.get(i).text();
             Book book = new Book(this.name, title, idList.get(i), null, false);
-            ArrayList<String> values = new ArrayList<String>();
             books.put(title, book);
         }
     }
