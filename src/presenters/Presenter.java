@@ -30,9 +30,15 @@ public class Presenter {
     }
 
     // Fonctions liees a la recherche ==================================================================================
-    public void search_performed(String query) throws IOException {
-        ArrayList<Book> results =  new ArrayList<>();
+    public void search_performed(String query) throws IOException, InterruptedException, BadLocationException {
+        ArrayList<Book> results =  model.get_search(query);
         view.show_search_result(results);
+    }
+
+    // Fonctions liees au bouton "definition" dans la vue "livre" ======================================================
+    public void definition_request(String selected_text) {
+        String definition = model.get_definition(selected_text);
+        view.show_definition_result(selected_text, definition);
     }
 
     // Fonctions liees au changement "d'etagere" dans la vue librairie ================================================
@@ -45,6 +51,11 @@ public class Presenter {
     public void read_performed(String category, Integer id)
             throws IOException, InterruptedException, BadLocationException {
         view.show_book_view(model.get_book(category, id));
+    }
+
+    // Fonctions liees au bouton "retour" dans la vue librairie ========================================================
+    public void back_button_clicked(String category, Integer book_id, Integer last_position) throws IOException {
+        model.update_last_position(category, book_id, last_position);
     }
 
     // Fonctions liees au telechargement et suppression de livre =======================================================
@@ -67,15 +78,11 @@ public class Presenter {
         model.annotation_deleted(category, id, annotation, start, end);
     }
 
-    // Fonctions liees au bouton "definition" dans la vue "livre" ======================================================
-    public void definition_request(String selected_text) {
-        String definition = model.get_definition(selected_text);
-        view.show_definition_result(selected_text, definition);
-    }
-
     // Fonctions liees au changement de parametres dans la vue "livre" =================================================
     public void settings_changed(String theme, String font, String fontSize) throws BackingStoreException {
         model.set_settings(theme, font, fontSize);
         view.change_settings(model.get_settings());
     }
+
+
 }

@@ -2,7 +2,6 @@ import presenters.Presenter;
 import models.Model;
 import views.View;
 import com.formdev.flatlaf.FlatDarkLaf;
-
 import javax.swing.*;
 
 public class App {

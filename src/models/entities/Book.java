@@ -27,13 +27,13 @@ public class Book {
     private String path;
     private String image_url;
 
-    public Book(String category, String title, Integer id, String path, Boolean is_downloaded) throws IOException {
+    public Book(String category, String title, Integer id, String path, Boolean is_downloaded, Integer last_position) throws IOException {
         this.category = category;
         this.title = title;
         this.id = id;
         this.is_downloaded = is_downloaded;
         this.path = path;
-        this.last_position = null;
+        this.last_position = last_position;
     }
 
     public String download() throws IOException {
@@ -116,17 +116,42 @@ public class Book {
         return is_downloaded;
     }
 
-    public Integer get_last_position() throws FileNotFoundException {
-        if (last_position == null) {
-            File info_file = new File(path.substring(0, path.length() - 4) + ".json");
-            if (info_file.exists()) {
-                last_position = Integer.parseInt(new Scanner(info_file).nextLine());
-            }
-        }
+    public Integer get_last_position() {
         return last_position;
     }
 
-    public void update_last_position() {}
+    public void set_last_position(Integer last_position) {
+        if (is_downloaded == false ) { return;}
+
+        // Read json file and get last position
+        JSONObject json = new JSONObject();
+        JSONArray annotationsArray = new JSONArray();
+
+        // Lire le fichier json et ajouter les elements qui y sont dans un nouveau objet json
+        try {
+            JSONParser parser = new JSONParser();
+            Object obj = parser.parse(new FileReader(path.substring(0, path.length() - 4) + ".json"));
+            JSONObject jsonObject = (JSONObject) obj;
+            json.put("id", jsonObject.get("id"));
+            annotationsArray = (JSONArray) jsonObject.get("annotations");
+        }  catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Ajouter la nouvelle position dans le json
+        json.put("last_position", last_position);
+        json.put("annotations", annotationsArray);
+
+        try {
+            FileWriter fileWriter = new FileWriter(path.substring(0, path.length() - 4) + ".json");
+            fileWriter.write(json.toJSONString());
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        this.last_position = last_position;
+    }
 
     public void add_annotation(String annotation, Integer start, Integer end) {
         String annotation_texte = annotation;
@@ -260,4 +285,6 @@ public class Book {
         this.image_url = "https://www.gutenberg.org/cache/epub/" + id + "/pg" + id + ".cover.medium.jpg";
         return image_url;
     }
+
+
 }

@@ -2,9 +2,11 @@ package views.tabs;
 
 import models.entities.Book;
 import views.View;
+import views.components.ImageCard;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.io.IOException;
@@ -65,10 +67,11 @@ public class SearchTab extends JPanel {
         // Le mot recherché
         main = new JPanel();
         search_label = new JLabel("Veuillez entrer un mot de recherche...");
-        search_label.setFont((search_label.getFont()).deriveFont(Font.PLAIN, 22));
+        search_label.setFont((search_label.getFont()).deriveFont(Font.PLAIN, 20));
 
         // Parametres ==================================================================================================
         JPanel main_panel = new JPanel();
+        // vertical layout
         main_panel.setLayout(new BoxLayout(main_panel, BoxLayout.Y_AXIS));
         main.setLayout(new FlowLayout());
         main.setBorder(BorderFactory.createEmptyBorder(0, 20, 20, 20));
@@ -76,10 +79,9 @@ public class SearchTab extends JPanel {
         // Contenu =====================================================================================================
         JPanel top = new JPanel();
         top.add(search_label);
-//        String[] links = {"https://www.gutenberg.org/cache/epub/66709/pg66709.cover.medium.jpg", "https://www.gutenberg.org/cache/epub/6130/pg6130.cover.medium.jpg", "https://www.gutenberg.org/cache/epub/64709/pg64709.cover.medium.jpg", "https://www.gutenberg.org/cache/epub/2852/pg2852.cover.medium.jpg", "https://www.gutenberg.org/cache/epub/2554/pg2554.cover.medium.jpg"};
-//        for (String link : links) {
-//            main.add(new ImageCard(link));
-//        }
+
+        top.setPreferredSize(new Dimension(Integer.MAX_VALUE, 50));
+        top.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
 
         main_panel.add(top);
         main_panel.add(main);
@@ -87,12 +89,16 @@ public class SearchTab extends JPanel {
     }
 
     // Fonctions diverses ==============================================================================================
-    public void show_result(ArrayList<Book> results) throws IOException {
-        System.out.println(results.size());
-//        for (Book book : results) {
-//            main.add(new ImageCard(book));
-//        }
-        search_label.setText("Résultats pour " + search_field.getText());
+    public void show_result(ArrayList<Book> results) throws IOException, InterruptedException, BadLocationException {
+        for (Book book : results) {
+            main.add(new ImageCard(book, view));
+        }
+        if (results.size() == 0) {
+            search_label.setText("Aucun résultat pour votre recherche... Veuillez réessayer.");
+        }
+        else {
+            search_label.setText("Résultats pour: \"" + search_field.getText() +"\"");
+        }
         search_field.setText("");
     }
 
@@ -103,14 +109,15 @@ public class SearchTab extends JPanel {
 
             @Override
             protected Void doInBackground() throws Exception {
-                System.out.println("Search button clicked");
+                main.removeAll();
+                main.revalidate();
                 if (search_field.getText().isEmpty()) {
                     new JOptionPane().showMessageDialog(null, "Veuillez entrer un mot de recherche non vide.", "Erreur",
                             JOptionPane.ERROR_MESSAGE);
                     return null;
                 }
                 try {
-                    System.out.println("Search button clicked");
+                    search_label.setText("Veuillez patienter....");
                     view.notify_search_performed(search_field.getText());
                 } catch (IOException ex) {
                     new JOptionPane().showMessageDialog(null, "Il y a eu une erreur lors de la recherche.", "Erreur",

@@ -55,16 +55,19 @@ public class Category {
                 if (fileName.endsWith(".txt")) {
                     String title = fileName.substring(0, fileName.length() - 4);
                     Integer id = -1;
+                    Integer lastPosition = 0;
                     try {
                         JSONParser parser = new JSONParser();
                         String jsonFile = filePath.replace(".txt", ".json");
                         JSONObject jsonObject = (JSONObject) parser.parse(new FileReader(jsonFile));
                         Long idlong = (Long) jsonObject.get("id");
                         id = idlong.intValue();
+                        Long lastPositionLong = (Long) jsonObject.get("last_position");
+                        lastPosition = lastPositionLong.intValue();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    Book book = new Book(this.name, title, id, filePath, true);
+                    Book book = new Book(this.name, title, id, filePath, true, lastPosition);
                     books.put(id, book);
                 }
             }
@@ -100,7 +103,7 @@ public class Category {
                 String title = titles.get(i).text();
                 Integer id = Integer.valueOf(idList.get(i));
                 String path = "https://www.gutenberg.org/cache/epub/" + id + "/pg" + id + ".txt";
-                Book book = new Book(this.name, title, id, path, false);
+                Book book = new Book(this.name, title, id, path, false, 0);
                 books.put(Integer.valueOf(idList.get(i)), book);
             }
 

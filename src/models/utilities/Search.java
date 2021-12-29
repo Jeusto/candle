@@ -50,29 +50,25 @@ public class Search {
             JSONParser parse = new JSONParser();
             JSONObject site = (JSONObject) parse.parse(inline);
             JSONArray results_array = (JSONArray) site.get("results");
-            for (int i = 0; i < results_array.size(); i++) {
-                if (i == 8) {
-                    break;
-                }
+            for (int i = 0; i < results_array.size() && i < 5; i++) {
                 JSONObject book_obj = (JSONObject) results_array.get(i);
                 JSONArray bookshelves = (JSONArray) book_obj.get("bookshelves");
-                if (bookshelves.size() > 0) {
-                    Integer id = (Integer) book_obj.get("id");
-                    String bookshelf = (String) bookshelves.get(0);
+                if (bookshelves.size() == 0) {
+                    continue;
+                }
+                String bookshelf = (String) bookshelves.get(0);
+                Long id = (Long) book_obj.get("id");
 
-                    Book book = model.get_book(bookshelf, id);
-
-                    if (book != null) {
-                        book.get_image_url();
-                        results.add(book);
-                    }
+                Book book = model.get_book(bookshelf, Math.toIntExact(id));
+                if (book != null) {
+                    book.get_image_url();
+                    results.add(book);
                 }
             }
         } catch (Exception e) {
-            return null;
+            //
         }
 
-        System.out.println(results);
         return results;
     }
 

@@ -16,7 +16,6 @@ import java.util.HashMap;
 
 
 public class LibraryTab extends JPanel {
-    private final View view;
 
     private final JScrollPane left_panel;
     private final JPanel main_panel;
@@ -25,6 +24,7 @@ public class LibraryTab extends JPanel {
     private JLabel current_category;
     private JLabel number_of_results;
 
+    private final View view;
     private DefaultListModel<String> books_list;
     private final models.entities.Library library;
     private HashMap<String, Integer> current_category_books_list;
@@ -168,7 +168,7 @@ public class LibraryTab extends JPanel {
         JPanel bottom = new JPanel();
         bottom.setLayout(new BoxLayout(bottom, BoxLayout.X_AXIS));
         bottom.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        this.number_of_results = new JLabel("Nombres de livres dans cette catégorie = 0");
+        number_of_results = new JLabel("Nombres de livres dans cette catégorie = 0");
         Image countIcon = ImageIO.read(getClass().getResource("/assets/count.png"));
         number_of_results.setIcon(new ImageIcon(countIcon));
         bottom.add(number_of_results);
@@ -202,7 +202,6 @@ public class LibraryTab extends JPanel {
 
     // Actions listeners ===============================================================================================
     private void tree_selection_listener() {
-        System.out.println("tree_selection_listener");
         // Si on a selectionne une categorie valide, on notifie la vue qu'on veut afficher les livres de cette categorie
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 

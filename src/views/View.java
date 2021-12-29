@@ -11,6 +11,7 @@ import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.formdev.flatlaf.FlatLightLaf;
+import views.tabs.WriteTab;
 
 import java.awt.*;
 import java.io.IOException;
@@ -27,6 +28,7 @@ public class View extends JFrame {
     private HomeTab home_tab;
     private LibraryTab library_tab;
     private SearchTab search_tab;
+    private WriteTab write_tab;
     private BookView book_view;
 
     private HashMap<String, String> user_settings;
@@ -47,6 +49,7 @@ public class View extends JFrame {
     public void set_presenter(Presenter presenter) {
         this.presenter = presenter;
     }
+
     public void initialize_content(models.entities.Library initial_library, HashMap<String,
             String> user_settings) throws Exception {
         this.user_settings = user_settings;
@@ -55,7 +58,8 @@ public class View extends JFrame {
         home_tab = new HomeTab();
         search_tab = new SearchTab(this);
         library_tab = new LibraryTab(this, initial_library);
-        tabs_view = new TabView(home_tab, search_tab, library_tab);
+        write_tab = new WriteTab();
+        tabs_view = new TabView(home_tab, search_tab, library_tab, write_tab);
         book_view = new BookView(this);
 
         // Parametres du composant =================================================================
@@ -74,10 +78,11 @@ public class View extends JFrame {
     }
 
     // Fonctions liees a la recherche ==================================================================================
-    public void notify_search_performed(String query) throws IOException {
+    public void notify_search_performed(String query) throws IOException, InterruptedException, BadLocationException {
         presenter.search_performed(query);
     }
-    public void show_search_result(ArrayList<Book> results) throws IOException {
+
+    public void show_search_result(ArrayList<Book> results) throws IOException, InterruptedException, BadLocationException {
         search_tab.show_result(results);
     }
 
@@ -85,6 +90,7 @@ public class View extends JFrame {
     public void notify_bookshelf_change_performed(String category) throws IOException {
         presenter.bookshelf_change_performed(category);
     }
+
     public void show_bookshelf_results(HashMap<Integer, Book> results) {
         library_tab.show_results(results);
     }
@@ -94,7 +100,8 @@ public class View extends JFrame {
             InterruptedException, BadLocationException {
         presenter.read_performed(category, id);
     }
-    public void show_book_view(Book current_book) throws IOException, InterruptedException, BadLocationException {
+
+    public void show_book_view(Book current_book) {
         book_view.show_book(current_book);
         card_layout.next(main_panel);
     }
@@ -109,7 +116,8 @@ public class View extends JFrame {
     }
 
     // Fonctions liees au bouton "retour" dans la vue "livre" ==========================================================
-    public void notify_back_performed() throws IOException {
+    public void notify_back_performed(String category, Integer book_id, Integer last_position) throws IOException {
+        presenter.back_button_clicked(category, book_id, last_position);
         card_layout.next(main_panel);
     }
 
@@ -118,7 +126,8 @@ public class View extends JFrame {
                                                 Integer start, Integer end) throws IOException {
         presenter.annotation_add_performed(category, id, annotation, start, end);
     }
-//    public void show_annotation_add_result(Integer id, String title, Integer start, Integer end,
+
+    //    public void show_annotation_add_result(Integer id, String title, Integer start, Integer end,
 //                                          String result) {
 //        library_tab.show_add_result(id, title, start, end result);
 //    }
@@ -135,6 +144,7 @@ public class View extends JFrame {
     public void notify_definition_request(String selected_text) {
         presenter.definition_request(selected_text);
     }
+
     public void show_definition_result(String selected_text, String definition) {
         book_view.show_definition_result(selected_text, definition);
     }
@@ -144,6 +154,7 @@ public class View extends JFrame {
             throws BackingStoreException {
         presenter.settings_changed(theme, font, fontSize);
     }
+
     public void change_settings(HashMap<String, String> settings) {
         // Changer la police et la taillle de la police dans la vue "livre"
         book_view.change_font(settings.get("font_family"), settings.get("font_size"));

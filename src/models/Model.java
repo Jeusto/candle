@@ -49,6 +49,10 @@ public class Model {
         Book book = find_book(category, id);
         return book;
     }
+    // Fonctions liees au bouton "retour" dans la vue librairie ========================================================
+    public void update_last_position(String category, Integer book_id, Integer last_position) throws IOException {
+        find_book(category, book_id).set_last_position(last_position);
+    }
 
     // Fonctions liees au telechargement et suppression de livre =======================================================
     public String download_book(String category, Integer id) throws IOException {
@@ -82,5 +86,6 @@ public class Model {
         Definition definition = new Definition(selectedText);
         return definition.get_definition();
     }
+
 }
 

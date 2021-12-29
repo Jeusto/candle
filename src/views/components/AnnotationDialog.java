@@ -8,18 +8,16 @@ import java.awt.*;
 import java.io.IOException;
 
 public class AnnotationDialog extends JDialog implements Dialog {
-    View view;
-
-    private final BookView parent_panel;
+    private final JPanel top_part;
+    private final JPanel bottom_part;
+    private JTextArea text_area;
 
     private final String category;
     private final Integer id;
     private final Integer start;
     private final Integer end;
-
-    private final JPanel top_part;
-    private final JPanel bottom_part;
-    private JTextArea text_area;
+    private final View view;
+    private final BookView parent_panel;
 
     public AnnotationDialog(View view, int width, int height, BookView parent_panel, String category, Integer id,
                             Integer start, Integer end) throws IOException {
@@ -85,7 +83,7 @@ public class AnnotationDialog extends JDialog implements Dialog {
         confirm_btn.addActionListener(e -> {
             try {
                 view.notify_annotation_add_performed(category, id, text_area.getText(), start, end);
-               parent_panel.show_highlights();
+                parent_panel.show_highlights();
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(this, "Il y a eu une erreur dans l'ajout de l'annotation.", "Erreur",
                         JOptionPane.ERROR_MESSAGE);

@@ -9,13 +9,13 @@ import java.io.IOException;
 import java.util.prefs.BackingStoreException;
 
 public class SettingsDialog extends JDialog implements Dialog {
-    View view;
 
     private final JPanel top_panel;
     private final JPanel bottom_panel;
     private JComboBox<String> theme_selector;
     private JComboBox<String> font_family_selector;
     private JComboBox<String> font_size_selector;
+    View view;
 
     public SettingsDialog(View view, int width, int height, JPanel parent_panel) throws IOException {
         this.view = view;
