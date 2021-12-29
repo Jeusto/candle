@@ -24,28 +24,26 @@ import javax.swing.text.BadLocationException;
 public class View extends JFrame {
     private Presenter presenter;
 
-    private TabView tabs_view;
+    private BookView book_view;
+    private TabView tab_view;
+
     private HomeTab home_tab;
     private LibraryTab library_tab;
     private SearchTab search_tab;
     private WriteTab write_tab;
-    private BookView book_view;
 
     private HashMap<String, String> user_settings;
 
     private CardLayout card_layout;
     private JPanel main_panel;
 
-
     public View() {
-        // Parametres ==================================================================================================
         setTitle("Candle : an e-book reader");
         setSize(1280, 720);
         setMinimumSize(new Dimension(960, 540));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    // Fonctions diverses ==============================================================================================
     public void set_presenter(Presenter presenter) {
         this.presenter = presenter;
     }
@@ -54,20 +52,19 @@ public class View extends JFrame {
             String> user_settings) throws Exception {
         this.user_settings = user_settings;
 
-        // Contenu du composant ====================================================================
         home_tab = new HomeTab();
-        search_tab = new SearchTab(this);
         library_tab = new LibraryTab(this, initial_library);
+        search_tab = new SearchTab(this);
         write_tab = new WriteTab();
-        tabs_view = new TabView(home_tab, search_tab, library_tab, write_tab);
+
+        tab_view = new TabView(home_tab, library_tab, search_tab, write_tab);
         book_view = new BookView(this);
 
-        // Parametres du composant =================================================================
         card_layout = new CardLayout();
         main_panel = new JPanel();
 
         main_panel.setLayout(card_layout);
-        main_panel.add("tabs", tabs_view);
+        main_panel.add("tabs", tab_view);
         main_panel.add("book", book_view);
 
         add(main_panel);
@@ -77,7 +74,6 @@ public class View extends JFrame {
         SwingUtilities.invokeLater(() -> setVisible(true));
     }
 
-    // Fonctions liees a la recherche ==================================================================================
     public void notify_search_performed(String query) throws IOException, InterruptedException, BadLocationException {
         presenter.search_performed(query);
     }
@@ -86,19 +82,17 @@ public class View extends JFrame {
         search_tab.show_result(results);
     }
 
-    // Fonctions liees au changement "d'etagere" dans la vue librairie =================================================
-    public void notify_bookshelf_change_performed(String category) throws IOException {
-        presenter.bookshelf_change_performed(category);
+    public void notify_bookshelf_change_performed(String bookshelf) throws IOException {
+        presenter.bookshelf_change_performed(bookshelf);
     }
 
     public void show_bookshelf_results(HashMap<Integer, Book> results) {
         library_tab.show_results(results);
     }
 
-    // Fonctions liees au bouton "lire" dans la vue librairie ==========================================================
-    public void notify_read_performed(String category, Integer id) throws IOException,
+    public void notify_read_performed(String bookshelf, Integer id) throws IOException,
             InterruptedException, BadLocationException {
-        presenter.read_performed(category, id);
+        presenter.read_performed(bookshelf, id);
     }
 
     public void show_book_view(Book current_book) {
@@ -106,53 +100,48 @@ public class View extends JFrame {
         card_layout.next(main_panel);
     }
 
-    // Fonctions liees au telechargement et suppression de livre =======================================================
-    public String notify_download_performed(String category, Integer id) throws IOException {
-        return presenter.download_button_clicked(category, id);
+    public void notify_download_performed(String bookshelf, Integer id) throws IOException {
+        presenter.download_button_clicked(bookshelf, id);
     }
 
-    public String notify_delete_performed(Integer id) throws IOException {
-        return presenter.delete_button_clicked(id);
+    public void show_download_result(String result) {
+        library_tab.show_download_result(result);
     }
 
-    // Fonctions liees au bouton "retour" dans la vue "livre" ==========================================================
-    public void notify_back_performed(String category, Integer book_id, Integer last_position) throws IOException {
-        presenter.back_button_clicked(category, book_id, last_position);
+    public void notify_delete_performed(Integer id) throws IOException {
+        presenter.delete_button_clicked(id);
+    }
+
+    public void show_delete_result(String result) {
+        library_tab.show_delete_result(result);
+    }
+
+    public void notify_back_performed(String bookshelf, Integer book_id, Integer last_position) throws IOException {
+        presenter.back_button_clicked(bookshelf, book_id, last_position);
         card_layout.next(main_panel);
     }
 
-    // Fonctions liees a l'ajout et suppression d'annotations dans la vue "livre" ======================================
-    public void notify_annotation_add_performed(String category, Integer id, String annotation,
+    public void notify_annotation_add_performed(String bookshelf, Integer id, String annotation,
                                                 Integer start, Integer end) throws IOException {
-        presenter.annotation_add_performed(category, id, annotation, start, end);
+        presenter.annotation_add_performed(bookshelf, id, annotation, start, end);
     }
 
-    //    public void show_annotation_add_result(Integer id, String title, Integer start, Integer end,
-//                                          String result) {
-//        library_tab.show_add_result(id, title, start, end result);
-//    }
-    public void notify_annotation_remove_performed(String category, Integer id, String annotation,
+    public void notify_annotation_remove_performed(String bookshelf, Integer id, String annotation,
                                                    Integer start, Integer end) throws IOException {
-        presenter.annotation_delete_performed(category, id, annotation, start, end);
+        presenter.annotation_remove_performed(bookshelf, id, annotation, start, end);
     }
-//    public void show_annotation_remove_result(Integer id, String title, Integer start,
-//                                              Integer end, String result) {
-//        library_tab.show_remove_result(id, title, start, end, result);
-//    }
 
-    // Fonctions liees au bouton "definition" dans la vue "livre" ======================================================
-    public void notify_definition_request(String selected_text) {
-        presenter.definition_request(selected_text);
+    public void notify_definition_requested(String selected_text) {
+        presenter.definition_requested(selected_text);
     }
 
     public void show_definition_result(String selected_text, String definition) {
         book_view.show_definition_result(selected_text, definition);
     }
 
-    // Fonctions liees au changement de parametres dans la vue "livre" =================================================
     public void notify_settings_change_performed(String theme, String font, String fontSize)
             throws BackingStoreException {
-        presenter.settings_changed(theme, font, fontSize);
+        presenter.settings_change_performed(theme, font, fontSize);
     }
 
     public void change_settings(HashMap<String, String> settings) {

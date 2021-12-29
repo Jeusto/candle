@@ -42,7 +42,7 @@ public class ImageCard extends JPanel {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 try {
-                    view.notify_read_performed(book.get_category(),book.get_id());
+                    view.notify_read_performed(book.get_bookshelf(),book.get_id());
                 } catch (IOException | BadLocationException | InterruptedException e) {
                     new JOptionPane().showMessageDialog(null, "Il y a eu une erreur de l'affichage du livre", "Erreur",
                             JOptionPane.ERROR_MESSAGE);                }

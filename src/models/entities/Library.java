@@ -43,8 +43,8 @@ public class Library {
                     while (index != -1) {
                         index2 = inputLine.indexOf("\"", index + 7);
                         String title = inputLine.substring(index + 7, index2);
-                        Category category = new Category(title, id, false);
-                        categories.put(title, category);
+                        Category bookshelf = new Category(title, id, false);
+                        categories.put(title, bookshelf);
                         index = inputLine.indexOf("/ebooks/bookshelf/", index2);
                     }
                 }

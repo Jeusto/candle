@@ -7,7 +7,6 @@ import views.components.ImageCard;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
-import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;

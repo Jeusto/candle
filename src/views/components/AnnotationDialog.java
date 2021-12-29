@@ -12,17 +12,17 @@ public class AnnotationDialog extends JDialog implements Dialog {
     private final JPanel bottom_part;
     private JTextArea text_area;
 
-    private final String category;
+    private final String bookshelf;
     private final Integer id;
     private final Integer start;
     private final Integer end;
     private final View view;
     private final BookView parent_panel;
 
-    public AnnotationDialog(View view, int width, int height, BookView parent_panel, String category, Integer id,
+    public AnnotationDialog(View view, int width, int height, BookView parent_panel, String bookshelf, Integer id,
                             Integer start, Integer end) throws IOException {
         this.view = view;
-        this.category = category;
+        this.bookshelf = bookshelf;
         this.id = id;
         this.start = start;
         this.end = end;
@@ -82,7 +82,7 @@ public class AnnotationDialog extends JDialog implements Dialog {
         // Notifier la vue pour ajouter l'annotation
         confirm_btn.addActionListener(e -> {
             try {
-                view.notify_annotation_add_performed(category, id, text_area.getText(), start, end);
+                view.notify_annotation_add_performed(bookshelf, id, text_area.getText(), start, end);
                 parent_panel.show_highlights();
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(this, "Il y a eu une erreur dans l'ajout de l'annotation.", "Erreur",

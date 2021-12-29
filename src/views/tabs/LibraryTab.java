@@ -21,18 +21,18 @@ public class LibraryTab extends JPanel {
     private final JPanel main_panel;
     private JList list;
     private JTree tree;
-    private JLabel current_category;
+    private JLabel current_bookshelf;
     private JLabel number_of_results;
 
     private final View view;
     private DefaultListModel<String> books_list;
     private final models.entities.Library library;
-    private HashMap<String, Integer> current_category_books_list;
+    private HashMap<String, Integer> current_bookshelf_books_list;
 
     public LibraryTab(View view, models.entities.Library library) throws Exception {
         this.view = view;
         this.library = library;
-        this.current_category_books_list = new HashMap<>();
+        this.current_bookshelf_books_list = new HashMap<>();
 
         // Parameteres =================================================================================================
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -60,9 +60,9 @@ public class LibraryTab extends JPanel {
         node_all.add(node_available);
 
         // Tree categories
-        library.get_categories().keySet().stream().sorted().forEach(category -> {
-            if (!category.equals("Livres téléchargés"))
-                node_available.add(new DefaultMutableTreeNode(category));
+        library.get_categories().keySet().stream().sorted().forEach(bookshelf -> {
+            if (!bookshelf.equals("Livres téléchargés"))
+                node_available.add(new DefaultMutableTreeNode(bookshelf));
         });
 
         // Tree
@@ -98,12 +98,12 @@ public class LibraryTab extends JPanel {
         main_panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         // Composants ==================================================================================================
-        // Titre de la category
-        current_category = new JLabel("");
-        current_category.setFont((this.current_category.getFont()).deriveFont(Font.PLAIN, 22));
-        current_category.setPreferredSize(new Dimension(0, 50));
-        current_category.setMinimumSize(new Dimension(0, 50));
-        current_category.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
+        // Titre de la bookshelf
+        current_bookshelf = new JLabel("");
+        current_bookshelf.setFont((this.current_bookshelf.getFont()).deriveFont(Font.PLAIN, 22));
+        current_bookshelf.setPreferredSize(new Dimension(0, 50));
+        current_bookshelf.setMinimumSize(new Dimension(0, 50));
+        current_bookshelf.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
 
         // Boutons en haut a droite
         JButton read_btn = new JButton("Lire");
@@ -133,7 +133,7 @@ public class LibraryTab extends JPanel {
         JPanel top = new JPanel();
         top.setLayout(new BoxLayout(top, FlowLayout.RIGHT));
         top.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        top.add(this.current_category);
+        top.add(this.current_bookshelf);
         top.add(read_btn);
         top.add(Box.createHorizontalStrut(10));
         top.add(download_btn);
@@ -184,16 +184,26 @@ public class LibraryTab extends JPanel {
     // Fonctions diverses ==============================================================================================
     public void show_results(HashMap<Integer, Book> results) {
         // On vide la liste
-        current_category_books_list = new HashMap<>();
+        current_bookshelf_books_list = new HashMap<>();
         books_list.clear();
 
         // Mise a jour de la liste de livres
         for (Book book : results.values()) {
             books_list.addElement(book.get_title());
-            current_category_books_list.put(book.get_title(), Integer.valueOf(book.get_id()));
+            current_bookshelf_books_list.put(book.get_title(), Integer.valueOf(book.get_id()));
         }
         // Mise a jour du nombre de livres
         number_of_results.setText("Nombres de livres dans cette catégorie = " + results.size());
+    }
+
+    public void show_download_result(String message) {
+        JOptionPane.showMessageDialog(null, message, "Résultat du téléchargement",
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public void show_delete_result(String message) {
+        JOptionPane.showMessageDialog(null, message, "Résultat de la suppression",
+                JOptionPane.INFORMATION_MESSAGE);
     }
 
     public void afficher_erreur(String message) {
@@ -211,7 +221,7 @@ public class LibraryTab extends JPanel {
                 if (node != null) {
                     Object nodeInfo = node.getUserObject();
                     if (node.isLeaf()) {
-                        current_category.setText(nodeInfo.toString());
+                        current_bookshelf.setText(nodeInfo.toString());
                         try {
                             view.notify_bookshelf_change_performed(nodeInfo.toString());
                         } catch (IOException ex) {
@@ -234,7 +244,7 @@ public class LibraryTab extends JPanel {
                     return null;
                 } else {
                     try {
-                        view.notify_read_performed(current_category.getText(), current_category_books_list.get(list.getSelectedValue()));
+                        view.notify_read_performed(current_bookshelf.getText(), current_bookshelf_books_list.get(list.getSelectedValue()));
                     } catch (IOException | BadLocationException | InterruptedException ex) {
                         afficher_erreur("Il y a eu une erreur dans l'affichage du livre voulu.");
                     }
@@ -255,12 +265,13 @@ public class LibraryTab extends JPanel {
                 } else {
                     try {
                         // On notifie la vue de l'action de téléchargement et on affiche ensuite le résultat
-                        String result = view.notify_download_performed(current_category.getText(), current_category_books_list.get(list.getSelectedValue()));
-                        JOptionPane.showMessageDialog(null, result, "Résultat du téléchargement",
-                                JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Le téléchargement a commencé, vous serez informé quand " +
+                                        "cela sera fini.",
+                                "Téléchargement en cours", JOptionPane.INFORMATION_MESSAGE);
+                        view.notify_download_performed(current_bookshelf.getText(), current_bookshelf_books_list.get(list.getSelectedValue()));
 
                         // Si on est actuellement dans la catégorie "Livres téléchargés", on doit rafraichir la liste
-                        if (current_category.getText().equals("Livres téléchargés")) {
+                        if (current_bookshelf.getText().equals("Livres téléchargés")) {
                             tree_selection_listener();
                         }
                     } catch (IOException ex) {
@@ -284,12 +295,10 @@ public class LibraryTab extends JPanel {
                 } else {
                     try {
                         // On notifie la vue de l'action de suppression et on affiche ensuite le résultat
-                        String result = view.notify_delete_performed(current_category_books_list.get(list.getSelectedValue()));
-                        JOptionPane.showMessageDialog(null, result, "Résultat de la suppression",
-                                JOptionPane.INFORMATION_MESSAGE);
+                        view.notify_delete_performed(current_bookshelf_books_list.get(list.getSelectedValue()));
 
                         // Si on est actuellement dans la catégorie "Livres téléchargés", on doit rafraichir la liste
-                        if (current_category.getText().equals("Livres téléchargés")) {
+                        if (current_bookshelf.getText().equals("Livres téléchargés")) {
                             tree_selection_listener();
                         }
                     } catch (IOException ex) {

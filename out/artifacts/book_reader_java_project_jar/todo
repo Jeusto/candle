@@ -1,0 +1,26 @@
+================= Priorite 1 ====================================
+- Tab de recherche
+- Implementer la pagination/scroll (+ sauvegarder position)
+- Se souvenir des parametres et police et taille de police amelioree
+
+================= Priorite 2 ====================================
+- Tab acceuil pour afficher quelques conneries
+- Caracteres speciales mal affichees
+
+================= Ajrdhui mais pas difficile ====================
+- Rendre le code plus beau, plus lisible, plus structure, plus francais, plus commente (assertions par ex)
+- Gerer tous les erreurs de la meme maniere et pas exit mais plutot afficher erreur et continuer!
+
+================= Dernier jour ==================================
+- Rapport qui explique les implementations, les choix etc
+- 2 diagrammes UML
+- Tester le .jar sur d'autres pc
+- Mise sous forme jar et depot sur Moodle
+
+
+
+----rapport----
+- revenir sur lle livre des apres avoir quite
+- certains livres ont pas le meme format interieurement
+- certains livres ont un fichier .txt qui finit differemment
+- sauvegarder la liste des livres et charger depuis fichier (pas appel html)

@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 public class Book {
-    private final String category;
+    private final String bookshelf;
     private final String title;
     private final Integer id;
 
@@ -27,8 +27,8 @@ public class Book {
     private String path;
     private String image_url;
 
-    public Book(String category, String title, Integer id, String path, Boolean is_downloaded, Integer last_position) throws IOException {
-        this.category = category;
+    public Book(String bookshelf, String title, Integer id, String path, Boolean is_downloaded, Integer last_position) throws IOException {
+        this.bookshelf = bookshelf;
         this.title = title;
         this.id = id;
         this.is_downloaded = is_downloaded;
@@ -82,10 +82,11 @@ public class Book {
 
         is_downloaded = true;
 
-        return "Le livre a été téléchargé.";
+        return "Le livre \"" + this.title + "\"  a été téléchargé.";
     }
 
     public String delete() throws IOException {
+        System.out.println(path);
         if (is_downloaded == false) {
             return "Ce livre n'est pas téléchargé.";
         }
@@ -97,7 +98,7 @@ public class Book {
         Files.delete(Paths.get(path));
 
         is_downloaded = false;
-        return "Le livre a bien été supprimé.";
+        return "Le livre \"" + this.title + "\" a bien été supprimé.";
     }
 
     public String get_title() {
@@ -273,8 +274,8 @@ public class Book {
         return annotations;
     }
 
-    public String get_category() {
-        return category;
+    public String get_bookshelf() {
+        return bookshelf;
     }
 
     private void setImage_url(String image_url) {

@@ -1,5 +1,6 @@
 package models.utilities;
 
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -8,7 +9,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Scanner;
 
-public class Definition {
+public class Definition  {
     private final String word;
     private final String definition;
     private final String api_url = "https://api.dictionaryapi.dev/api/v2/entries/en/";

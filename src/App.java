@@ -2,10 +2,11 @@ import presenters.Presenter;
 import models.Model;
 import views.View;
 import com.formdev.flatlaf.FlatDarkLaf;
+import views.components.BookView;
+
 import javax.swing.*;
 
 public class App {
-
     public static void create_and_show_app() throws Exception {
         Model model = new Model();
         View view = new View();

@@ -29,8 +29,8 @@ public class Model {
     public Library get_library() {
         return library;
     }
-    private Book find_book(String category, Integer id) throws IOException {
-        return library.get_categories().get(category).get_books().get(id);
+    private Book find_book(String bookshelf, Integer id) throws IOException {
+        return library.get_categories().get(bookshelf).get_books().get(id);
     }
 
     // Fonctions liees a la recherche ==================================================================================
@@ -39,24 +39,24 @@ public class Model {
     }
 
     // Fonctions liees au changement "d'etagere" dans la vue librairie =================================================
-    public HashMap<Integer, Book> get_category_books(String category) throws IOException {
-        return library.get_categories().get(category).get_books();
+    public HashMap<Integer, Book> get_bookshelf_books(String bookshelf) throws IOException {
+        return library.get_categories().get(bookshelf).get_books();
     }
 
     // Fonctions liees au bouton "lire" dans la vue librairie ==========================================================
-    public Book get_book(String category, Integer id) throws IOException {
-        get_category_books(category);
-        Book book = find_book(category, id);
+    public Book get_book(String bookshelf, Integer id) throws IOException {
+        get_bookshelf_books(bookshelf);
+        Book book = find_book(bookshelf, id);
         return book;
     }
     // Fonctions liees au bouton "retour" dans la vue librairie ========================================================
-    public void update_last_position(String category, Integer book_id, Integer last_position) throws IOException {
-        find_book(category, book_id).set_last_position(last_position);
+    public void update_last_position(String bookshelf, Integer book_id, Integer last_position) throws IOException {
+        find_book(bookshelf, book_id).set_last_position(last_position);
     }
 
     // Fonctions liees au telechargement et suppression de livre =======================================================
-    public String download_book(String category, Integer id) throws IOException {
-        return find_book(category, id).download();
+    public String download_book(String bookshelf, Integer id) throws IOException {
+        return find_book(bookshelf, id).download();
     }
     public String delete_book(Integer id) throws IOException {
         String result = library.get_categories().get("Livres téléchargés").get_books().get(id).delete();
@@ -65,11 +65,11 @@ public class Model {
     }
 
     // Fonctions liees a l'ajout et suppression d'annotations dans la vue "livre" ======================================
-    public void annotation_added(String category, Integer id, String annotation, Integer start, Integer end) throws IOException {
-        find_book(category, id).add_annotation(annotation, start, end);
+    public void annotation_added(String bookshelf, Integer id, String annotation, Integer start, Integer end) throws IOException {
+        find_book(bookshelf, id).add_annotation(annotation, start, end);
     }
-    public void annotation_deleted(String category, Integer id, String annotation, Integer start, Integer end) throws IOException {
-        find_book(category, id).delete_annotation(annotation, start, end);
+    public void annotation_deleted(String bookshelf, Integer id, String annotation, Integer start, Integer end) throws IOException {
+        find_book(bookshelf, id).delete_annotation(annotation, start, end);
     }
 
     // Fonctions liees au changement de parametres dans la vue "livre" =================================================

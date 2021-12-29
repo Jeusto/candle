@@ -32,11 +32,11 @@ public class Category {
     }
 
     private void load_books() throws IOException {
-        // If the category is already loaded, return
+        // If the bookshelf is already loaded, return
         if (!books.isEmpty() && !is_local) {
             return;
         }
-        // If the category is local, load the books from the local file
+        // If the bookshelf is local, load the books from the local file
         if (is_local) {
             load_local_books();
         } else {
@@ -75,10 +75,10 @@ public class Category {
     }
 
     private void load_remote_books() throws IOException {
-        String categoryUrl = "https://www.gutenberg.org/ebooks/bookshelf/" + id.toString();
+        String bookshelfUrl = "https://www.gutenberg.org/ebooks/bookshelf/" + id.toString();
         while (true) {
             // Connect to the URL
-            Document doc = Jsoup.connect(categoryUrl).get();
+            Document doc = Jsoup.connect(bookshelfUrl).get();
 
             // Get book titles
             Elements titles = doc.select(".booklink a.link .title");
@@ -114,7 +114,7 @@ public class Category {
             }
 
             String title = links_titles.get(0).attr("href");
-            categoryUrl = "https://www.gutenberg.org" + title;
+            bookshelfUrl = "https://www.gutenberg.org" + title;
         }
     }
 }

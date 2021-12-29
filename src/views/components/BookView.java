@@ -11,8 +11,6 @@ import javax.swing.text.*;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -39,7 +37,7 @@ public class BookView extends JPanel {
     private Book current_book;
     private final HashMap<Integer, Highlighter.Highlight> highlights;
     private HashMap<Integer, Annotation> annotations;
-    private String current_category;
+    private String current_bookshelf;
     private int last_mouse_position;
 
     public BookView(View view) throws IOException {
@@ -233,7 +231,7 @@ public class BookView extends JPanel {
     public void show_book(Book book) {
         // Modifier le titre et la categorie
         current_book_title.setText(book.get_title());
-        current_category = book.get_category();
+        current_bookshelf = book.get_bookshelf();
         current_book = book;
 
         JScrollBar scrollBar = text_scroll_pane.getVerticalScrollBar();
@@ -311,7 +309,7 @@ public class BookView extends JPanel {
             // Notifier la vue qu'on veut aller en arrière
             // get the percentage from the text pane
             int scrolledAmount = text_scroll_pane.getVerticalScrollBar().getValue();
-            view.notify_back_performed(current_book.get_category(), current_book.get_id(),
+            view.notify_back_performed(current_book.get_bookshelf(), current_book.get_id(),
                     scrolledAmount);
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -393,7 +391,7 @@ public class BookView extends JPanel {
         try {
             // On affiche l'annotation
             new AnnotationDialog(view, this.getSize().width / 2, this.getSize().height / 2,
-                    this, current_category, current_book.get_id(), start, end);
+                    this, current_bookshelf, current_book.get_id(), start, end);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -410,7 +408,7 @@ public class BookView extends JPanel {
                 if (a != null) {
                     try {
                         // Si oui on notifie la vue qu'on veut supprimer l'annotation
-                        view.notify_annotation_remove_performed(current_category, current_book.get_id(), a.get_text(),
+                        view.notify_annotation_remove_performed(current_bookshelf, current_book.get_id(), a.get_text(),
                                 a.get_start(), a.get_start());
                         // On supprime le surlignage
                         highlighter.removeHighlight(h);
@@ -438,7 +436,7 @@ public class BookView extends JPanel {
                 } else {
                     s = text_pane.getSelectedText();
                 }
-                view.notify_definition_request(s);
+                view.notify_definition_requested(s);
                 return null;
             }
         };
