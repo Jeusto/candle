@@ -1,21 +1,21 @@
 package models.entities;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 public class Settings {
-    private String[] possible_themes = {"Flat Dark", "Flat Light", "Flat Intellij", "Flat Darcula"};
-    private String[] possible_font_families = {"Arial", "Courier", "Helvetica", "Times New Roman", "Verdana"};
-    private Integer[] possible_font_Sizes = {8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72};
+    private final String[] possible_themes = {"Flat Dark", "Flat Light", "Flat Intellij", "Flat Darcula"};
+    private final String[] possible_font_families = {"Arial", "Courier", "Helvetica", "Times New Roman", "Verdana"};
+    private final Integer[] possible_font_sizes = {8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72};
 
     private Preferences preferences;
 
-    public Settings() throws BackingStoreException {
+    public Settings() {
         set_all_settings("Flat Dark", "Arial", "12");
     }
 
-    public void set_all_settings(String theme, String font, String fontSize) throws BackingStoreException {
+    public void set_all_settings(String theme, String font, String fontSize) {
         preferences = Preferences.userRoot().node(this.getClass().getName());
         preferences.put("theme", theme);
         preferences.put("font_family", font);
@@ -30,4 +30,11 @@ public class Settings {
         return settings;
     }
 
+    public ArrayList<Object[]> get_possible_values() {
+        ArrayList<Object[]> values = new ArrayList<Object[]>();
+        values.add(possible_themes);
+        values.add(possible_font_families);
+        values.add(possible_font_sizes);
+        return values;
+    }
 }

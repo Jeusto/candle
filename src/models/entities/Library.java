@@ -10,7 +10,7 @@ import java.net.URLConnection;
 import java.util.HashMap;
 
 public class Library {
-    private HashMap<String, Category> categories;
+    private final HashMap<String, Category> categories;
 
     public Library() throws MalformedURLException {
         categories = new HashMap<>();
@@ -23,6 +23,7 @@ public class Library {
     }
 
     public void create_remote_bookshelves() throws MalformedURLException {
+        // On récupère la liste des catégories disponibles en lisant la page des categories et en extraitant les liens
         URL u = new URL("https://www.gutenberg.org/ebooks/bookshelf/");
 
         try {
@@ -55,13 +56,13 @@ public class Library {
     }
 
     public void create_local_bookshelves() {
-        // Create app directory if it doesn't exist
+        // Creer le repertoire de l'application si il n'existe pas
         File app_directory = new File(System.getProperty("user.home") + "/.candle-book-reader");
         if (!app_directory.exists()) {
             app_directory.mkdir();
         }
 
-        // Load local books
+        // Charger les livres disponibles localement
         Category localCategory = new Category("Livres téléchargés", -1, true);
         categories.put("Livres téléchargés", localCategory);
     }

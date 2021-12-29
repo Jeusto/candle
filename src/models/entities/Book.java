@@ -7,6 +7,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import javax.swing.plaf.synth.SynthTextAreaUI;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -16,14 +17,15 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 public class Book {
-    private String category;
-    private String title;
-    private Integer id;
-    private Integer last_position;
+    private final String category;
+    private final String title;
+    private final Integer id;
+
     private HashMap<Integer, Annotation> annotations;
+    private Integer last_position;
+    private Boolean is_downloaded;
+    private String path;
     private String image_url;
-    Boolean is_downloaded;
-    String path;
 
     public Book(String category, String title, Integer id, String path, Boolean is_downloaded) throws IOException {
         this.category = category;
@@ -35,24 +37,27 @@ public class Book {
     }
 
     public String download() throws IOException {
-        if (path == null) {
-            find_path();
+        try {
+            Thread.sleep(2000);
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
         }
         if (is_downloaded) {
             return "Ce livre est déjà téléchargé. Merci de réeassayer avec un autre livre.";
         }
 
-        // download the book from the url using utf8 encoding
+        // On télécharge le fichier depuis l'url
         URL url = new URL(path);
         InputStream is = url.openStream();
         BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
 
-        // create a new file
+        // On crée le fichier
         path = System.getProperty("user.home") + "/.candle-book-reader/" + title + ".txt";
         File file = new File(path);
         file.createNewFile();
 
-        // write the content to the file
+        // On écrit le livre dans le fichier
         FileWriter fw = new FileWriter(file.getAbsoluteFile());
         BufferedWriter bw = new BufferedWriter(fw);
         String line;
@@ -61,21 +66,15 @@ public class Book {
             bw.newLine();
         }
 
-
-        // Create json object
+        // On crée l'objet json qui va contenir les informations sur le livre et les annotations
         JSONObject json = new JSONObject();
         json.put("last_position", 0);
         json.put("id", this.id);
         json.put("annotations", new JSONArray());
 
-        // Write to file
+        // On écrit le json dans un autre fichier
         File myObj = new File(System.getProperty("user.home") + "/.candle-book-reader/" + title + ".json");
-        try {
-            myObj.createNewFile();
-        }
-        catch (IOException e) {
-            System.out.println("An error occurred.");
-        }
+        myObj.createNewFile();
         FileWriter fileWriter = new FileWriter(path.substring(0, path.length() - 4) + ".json");
 
         fileWriter.write(json.toJSONString());
@@ -110,25 +109,7 @@ public class Book {
     }
 
     public String get_path() throws IOException {
-        if (path == null) {
-            find_path();
-        }
         return path;
-    }
-
-    private void find_path() throws IOException {
-        // Remote path
-        String remote_path = "https://gutenberg.org/files/" + id;
-
-        Document doc = Jsoup.connect(remote_path).get();
-
-        Elements titles = doc.select("td > a");
-
-        path = remote_path + "/" + titles.get(1).attr("href");
-    }
-
-    public Book get_book() {
-        return this;
     }
 
     public boolean is_downloaded() {
@@ -217,9 +198,7 @@ public class Book {
         Long start_long = Long.valueOf(start);
         for (int i = 0; i < annotationsArray.size(); i++) {
             JSONObject annotation_json = (JSONObject) annotationsArray.get(i);
-            System.out.println(annotation_json.get("start"));
             if (annotation_json.get("start").equals(start_long)) {
-                System.out.println("found it");
                 annotationsArray.remove(i);
             }
         }

@@ -1,13 +1,10 @@
-package models.entities;
+package models.utilities;
 
 import models.Model;
+import models.entities.Book;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -15,9 +12,9 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Search {
-    private String query;
-    private String search_result;
-    private String api_url = "https://api.dictionaryapi.dev/api/v2/entries/en/";
+    private final String query;
+    private String result;
+    private final String api_url = "https://api.dictionaryapi.dev/api/v2/entries/en/";
 
     public Search(String query) {
         this.query = query;
@@ -28,30 +25,28 @@ public class Search {
         JSONObject data_obj = null;
         ArrayList<Book> results = new ArrayList<>();
         try {
-            // replace spaces in the query with %20
+            // On se connecte à l'API
             URL url = new URL("https://gutendex.com/books/?search=" + query.replace(" ", "%20"));
-
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.connect();
 
-            // Getting the response code
+            // Si la requête n'a pas abouti, on renvoie null
             int responsecode = conn.getResponseCode();
             if (responsecode != 200) {
                 return null;
             }
+
+            // La requete a reussi, on recupere la reponse JSON dans un String
             String inline = "";
             Scanner scanner = new Scanner(url.openStream());
 
-            // Write all the JSON data into a string using a scanner
             while (scanner.hasNext()) {
                 inline += scanner.nextLine();
             }
-
-            // Close the scanner
             scanner.close();
 
-            // Using the JSON simple library parse the string into a json object
+            // On traite l'objet JSON pour avoir le resultat
             JSONParser parse = new JSONParser();
             JSONObject site = (JSONObject) parse.parse(inline);
             JSONArray results_array = (JSONArray) site.get("results");
@@ -64,8 +59,6 @@ public class Search {
                 if (bookshelves.size() > 0) {
                     Integer id = (Integer) book_obj.get("id");
                     String bookshelf = (String) bookshelves.get(0);
-                    System.out.println(id);
-                    System.out.println(bookshelf);
 
                     Book book = model.get_book(bookshelf, id);
 
@@ -75,16 +68,16 @@ public class Search {
                     }
                 }
             }
-
         } catch (Exception e) {
-            e.printStackTrace();
+            return null;
         }
 
+        System.out.println(results);
         return results;
     }
 
 
     public String get_search() {
-        return search_result;
+        return result;
     }
 }

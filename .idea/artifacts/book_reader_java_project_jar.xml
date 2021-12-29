@@ -1,10 +1,11 @@
 <component name="ArtifactManager">
-  <artifact type="jar" build-on-make="true" name="book-reader-java-project:jar">
+  <artifact type="jar" name="book-reader-java-project:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/book_reader_java_project_jar</output-path>
     <root id="archive" name="book-reader-java-project.jar">
       <element id="module-output" name="book-reader-java-project" />
       <element id="extracted-dir" path="$PROJECT_DIR$/flatlaf.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/jsoup.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/json-simple.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

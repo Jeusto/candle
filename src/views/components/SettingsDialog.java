@@ -9,106 +9,118 @@ import java.io.IOException;
 import java.util.prefs.BackingStoreException;
 
 public class SettingsDialog extends JDialog implements Dialog {
-    private JPanel topPanel;
-    private JPanel buttonPanel;
-    private JComboBox<String> themeSelect;
-    private JComboBox<String> fontSelect;
-    private JComboBox<String> fontSizeSelect;
     View view;
 
-    public SettingsDialog(View view, int width, int height, JPanel parentPanel) throws IOException {
-        this.view = view;
-        // ===== Composants ======
-        topPanel = create_top_panel(width, height);
-        buttonPanel = create_bottom_panel();
+    private final JPanel top_panel;
+    private final JPanel bottom_panel;
+    private JComboBox<String> theme_selector;
+    private JComboBox<String> font_family_selector;
+    private JComboBox<String> font_size_selector;
 
-        // ===== Parametres ======
+    public SettingsDialog(View view, int width, int height, JPanel parent_panel) throws IOException {
+        this.view = view;
+
+        // Parametres ==================================================================================================
         setTitle("Paramètres d'affichage");
         setSize(500, 300);
-        setLocationRelativeTo(parentPanel);
+        setLocationRelativeTo(parent_panel);
         setResizable(false);
         setModal(true);
         setLayout(new BorderLayout());
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        // ===== Contenu ======
-        add(topPanel, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
+        // Composants ==================================================================================================
+        top_panel = create_top_panel(width, height);
+        bottom_panel = create_bottom_panel();
+
+        // Contenu =====================================================================================================
+        add(top_panel, BorderLayout.CENTER);
+        add(bottom_panel, BorderLayout.SOUTH);
 
         setVisible(true);
     }
 
     public JPanel create_top_panel(int width, int height) throws IOException {
-        // ===== Composants ======
-        // Theme selection
-        JLabel themeSelectLabel = new JLabel("Choix du thème général");
-        themeSelect = new JComboBox<>();
-        String[] themePossibleValues = {"Flat Light", "Flat Dark", "Flat Intellij", "Flat Darcula"};
-        for (String themePossibleValue : themePossibleValues) {
-            themeSelect.addItem(themePossibleValue);
+        // Parametres ==================================================================================================
+        JPanel top_panel = new JPanel();
+        top_panel.setLayout(new BoxLayout(top_panel, BoxLayout.Y_AXIS));
+        top_panel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
+        top_panel.setMaximumSize(new Dimension(width, height));
+
+        // Composants ==================================================================================================
+        // Selecteur de theme
+        JLabel theme_label = new JLabel("Choix du thème général");
+        theme_selector = new JComboBox<>();
+        String[] theme_possible_values = {"Flat Light", "Flat Dark", "Flat Intellij", "Flat Darcula"};
+        for (String possible_value : theme_possible_values) {
+            theme_selector.addItem(possible_value);
         }
 
-        // Font selection
-        JLabel fontSelectLabel = new JLabel("Choix de la police d'écriture", SwingConstants.CENTER);
-        fontSelect = new JComboBox<>();
-        String[] fontsPossibleValues = {"Arial", "Courier", "Helvetica", "Times New Roman", "Verdana"};
-        for (String fontSize : fontsPossibleValues) {
-            fontSelect.addItem(fontSize);
+        // Selecteur de police
+        JLabel font_family_label = new JLabel("Choix de la police d'écriture", SwingConstants.CENTER);
+        font_family_selector = new JComboBox<>();
+        String[] font_families_possible_values = {"Arial", "Courier", "Helvetica", "Times New Roman", "Verdana"};
+        for (String possible_value : font_families_possible_values) {
+            font_family_selector.addItem(possible_value);
         }
 
-        // Font size selection
-        JLabel fontSizeLabel = new JLabel("Choisir la ta taille de la police");
-        fontSizeSelect = new JComboBox<>();
-        String[] fontSizePossibleValues = {"8", "9", "10", "11", "12", "14", "16", "18", "20", "22", "24", "26", "28", "36", "48", "72"};
-        for (String fontSize : fontSizePossibleValues) {
-            fontSizeSelect.addItem(fontSize);
+        // Selecteur de taille de police
+        JLabel font_size_label = new JLabel("Choisir la ta taille de la police");
+        font_size_selector = new JComboBox<>();
+        String[] font_size_possible_values = {"8", "9", "10", "11", "12", "14", "16", "18", "20", "22", "24", "26", "28", "36", "48", "72"};
+        for (String possible_value : font_size_possible_values) {
+            font_size_selector.addItem(possible_value);
         }
 
-        // ===== Parametres ======
-        JPanel selectionPanel = new JPanel();
-        selectionPanel.setLayout(new BoxLayout(selectionPanel, BoxLayout.Y_AXIS));
-        selectionPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
-        selectionPanel.setMaximumSize(new Dimension(width, height));
+        // Contenu =====================================================================================================
+        top_panel.add(theme_label);
+        top_panel.add(theme_selector);
+        top_panel.add(Box.createVerticalStrut(20));
+        top_panel.add(font_family_label);
+        top_panel.add(font_family_selector);
+        top_panel.add(Box.createVerticalStrut(20));
+        top_panel.add(font_size_label);
+        top_panel.add(font_size_selector);
+        top_panel.add(Box.createVerticalStrut(20));
 
-        // ===== Contenu ======
-        selectionPanel.add(themeSelectLabel); selectionPanel.add(themeSelect); selectionPanel.add(Box.createVerticalStrut(20));
-        selectionPanel.add(fontSelectLabel); selectionPanel.add(fontSelect); selectionPanel.add(Box.createVerticalStrut(20));
-        selectionPanel.add(fontSizeLabel); selectionPanel.add(fontSizeSelect); selectionPanel.add(Box.createVerticalStrut(20));
-
-        return selectionPanel;
+        return top_panel;
     }
 
     public JPanel create_bottom_panel() throws IOException {
-        // ===== Composants ======
-        // Confirm button
-        JButton confirmButton = new JButton("Confirmer");
-        Image confirmIcon = ImageIO.read(getClass().getResource("/assets/confirm.png"));
-        confirmButton.setIcon(new ImageIcon(confirmIcon));
-        confirmButton.addActionListener(e -> {
+        // Parametres ==================================================================================================
+        JPanel bottom_panel = new JPanel();
+        bottom_panel.setBorder(BorderFactory.createEmptyBorder(0, 200, 20, 10));
+
+        // Composants ==================================================================================================
+        // Bouton pour confirmer les parametres
+        JButton confirm_btn = new JButton("Confirmer");
+        Image confirm_icon = ImageIO.read(getClass().getResource("/assets/confirm.png"));
+        confirm_btn.setIcon(new ImageIcon(confirm_icon));
+
+        // Notifier la vue pour changer modifier les parametres
+        confirm_btn.addActionListener(e -> {
             try {
-                view.notify_settings_changed(themeSelect.getSelectedItem().toString(), fontSelect.getSelectedItem().toString(), fontSizeSelect.getSelectedItem().toString());
-                dispose();
+                view.notify_settings_change_performed(theme_selector.getSelectedItem().toString(),
+                        font_family_selector.getSelectedItem().toString(), font_size_selector.getSelectedItem().toString());
             } catch (BackingStoreException ex) {
-                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Il y a eu une erreur dans le changement de parametres", "Erreur",
+                        JOptionPane.ERROR_MESSAGE);
             }
+            dispose();
         });
 
-        // Cancel button
-        JButton cancelButton = new JButton("Annuler");
-        Image cancelIcon = ImageIO.read(getClass().getResource("/assets/cancel.png"));
-        cancelButton.setIcon(new ImageIcon(cancelIcon));
-        cancelButton.addActionListener(e -> dispose());
+        // Bouton pour annuler et fermer la fenetre
+        JButton cancel_btn = new JButton("Annuler");
+        Image cancel_icon = ImageIO.read(getClass().getResource("/assets/cancel.png"));
+        cancel_btn.setIcon(new ImageIcon(cancel_icon));
+        cancel_btn.addActionListener(e -> dispose());
 
-        // ===== Parametres ======
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 200, 20, 10));
+        // Contenu =====================================================================================================
+        bottom_panel.add(Box.createHorizontalGlue());
+        bottom_panel.add(Box.createHorizontalGlue());
+        bottom_panel.add(confirm_btn);
+        bottom_panel.add(cancel_btn);
 
-        // ===== Contenu ======
-        buttonPanel.add(Box.createHorizontalGlue());
-        buttonPanel.add(Box.createHorizontalGlue());
-        buttonPanel.add(confirmButton);
-        buttonPanel.add(cancelButton);
-
-        return buttonPanel;
+        return bottom_panel;
     }
 }

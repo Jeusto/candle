@@ -8,96 +8,103 @@ import java.awt.*;
 import java.io.IOException;
 
 public class AnnotationDialog extends JDialog implements Dialog {
-    private JPanel topPanel;
-    private JPanel buttonPanel;
-    private JTextArea text_area;
-    private String category;
-    private Integer id;
-    private Integer start;
-    private Integer end;
-    private BookView parentPanel;
     View view;
 
-    public AnnotationDialog(View view, int width, int height, BookView parentPanel, String category, Integer id, Integer start, Integer end) throws IOException {
+    private final BookView parent_panel;
+
+    private final String category;
+    private final Integer id;
+    private final Integer start;
+    private final Integer end;
+
+    private final JPanel top_part;
+    private final JPanel bottom_part;
+    private JTextArea text_area;
+
+    public AnnotationDialog(View view, int width, int height, BookView parent_panel, String category, Integer id,
+                            Integer start, Integer end) throws IOException {
         this.view = view;
         this.category = category;
         this.id = id;
         this.start = start;
         this.end = end;
-        this.parentPanel = parentPanel;
+        this.parent_panel = parent_panel;
 
-        // ===== Composants ======
-        topPanel = create_top_panel(width, height);
-        buttonPanel = create_bottom_panel();
-
-        // ===== Parametres ======
+        // Parametres ==================================================================================================
         setTitle("Créer une annotation");
         setSize(500, 300);
-        setLocationRelativeTo(parentPanel);
+        setLocationRelativeTo(parent_panel);
         setResizable(false);
         setModal(true);
         setLayout(new BorderLayout());
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        // ===== Contenu ======
-        add(topPanel, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
+        // Composants ==================================================================================================
+        top_part = create_top_panel(width, height);
+        bottom_part = create_bottom_panel();
+
+        // Contenu =====================================================================================================
+        add(top_part, BorderLayout.CENTER);
+        add(bottom_part, BorderLayout.SOUTH);
 
         setVisible(true);
     }
 
-    public JPanel create_top_panel(int width, int height) throws IOException {
-        // ===== Composants ======
-        // Text area
+    public JPanel create_top_panel(int width, int height) {
+        // Parametres ==================================================================================================
+        JPanel top_panel = new JPanel();
+        top_panel.setLayout(new BoxLayout(top_panel, BoxLayout.Y_AXIS));
+        top_panel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
+        top_panel.setMaximumSize(new Dimension(width, height));
+
+        // Composants ==================================================================================================
+        // Zone pour ecrire l'annotation
         text_area = new JTextArea();
         text_area.setLineWrap(true);
         text_area.setWrapStyleWord(true);
         text_area.setText("");
 
-        // ===== Parametres ======
-        JPanel selectionPanel = new JPanel();
-        selectionPanel.setLayout(new BoxLayout(selectionPanel, BoxLayout.Y_AXIS));
-        selectionPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
-        selectionPanel.setMaximumSize(new Dimension(width, height));
+        // Contenu =====================================================================================================
+        top_panel.add(text_area);
 
-        // ===== Contenu ======
-        selectionPanel.add(text_area);
-
-        return selectionPanel;
+        return top_panel;
     }
 
     public JPanel create_bottom_panel() throws IOException {
-        // ===== Composants ======
-        // Confirm button
-        JButton confirmButton = new JButton("Confirmer");
-        Image confirmIcon = ImageIO.read(getClass().getResource("/assets/confirm.png"));
-        confirmButton.setIcon(new ImageIcon(confirmIcon));
-        confirmButton.addActionListener(e -> {
+        // Parametres ==================================================================================================
+        JPanel bottom_panel = new JPanel();
+        bottom_panel.setBorder(BorderFactory.createEmptyBorder(0, 200, 20, 10));
+
+        // Composants ==================================================================================================
+        // Bouton pour confirmer et ajouter l'annotation
+        JButton confirm_btn = new JButton("Confirmer");
+        Image confirm_icon = ImageIO.read(getClass().getResource("/assets/confirm.png"));
+        confirm_btn.setIcon(new ImageIcon(confirm_icon));
+
+        // Notifier la vue pour ajouter l'annotation
+        confirm_btn.addActionListener(e -> {
             try {
-                view.notify_annotation_added(category, id, text_area.getText(), start, end);
-                parentPanel.show_highlights();
+                view.notify_annotation_add_performed(category, id, text_area.getText(), start, end);
+               parent_panel.show_highlights();
             } catch (IOException ex) {
-                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Il y a eu une erreur dans l'ajout de l'annotation.", "Erreur",
+                        JOptionPane.ERROR_MESSAGE);
             }
             dispose();
         });
 
-        // Cancel button
-        JButton cancelButton = new JButton("Annuler");
-        Image cancelIcon = ImageIO.read(getClass().getResource("/assets/cancel.png"));
-        cancelButton.setIcon(new ImageIcon(cancelIcon));
-        cancelButton.addActionListener(e -> dispose());
+        // Bouton pour annuler et fermer la fenetre
+        JButton cancel_btn = new JButton("Annuler");
+        Image cancel_icon = ImageIO.read(getClass().getResource("/assets/cancel.png"));
+        cancel_btn.setIcon(new ImageIcon(cancel_icon));
+        cancel_btn.addActionListener(e -> dispose());
 
-        // ===== Parametres ======
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 200, 20, 10));
+        // Contenu =====================================================================================================
+        bottom_panel.add(Box.createHorizontalGlue());
+        bottom_panel.add(Box.createHorizontalGlue());
+        bottom_panel.add(confirm_btn);
+        bottom_panel.add(cancel_btn);
 
-        // ===== Contenu ======
-        buttonPanel.add(Box.createHorizontalGlue());
-        buttonPanel.add(Box.createHorizontalGlue());
-        buttonPanel.add(confirmButton);
-        buttonPanel.add(cancelButton);
-
-        return buttonPanel;
+        return bottom_panel;
     }
 }

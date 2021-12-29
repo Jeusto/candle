@@ -1,7 +1,7 @@
 <component name="libraryTable">
-  <library name="flatlaf">
+  <library name="jsoup">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/flatlaf.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jsoup.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

@@ -2,7 +2,6 @@
 - Tab de recherche
 - Implementer la pagination/scroll (+ sauvegarder position)
 - Se souvenir des parametres et police et taille de police amelioree
-- Faire le telechargement et operations lourdes en multi threading (par exemple telechargement/delete: ne pas attendre le resultat de la fonction download, download se fais en backround puis appelle une fonction de view quand cest fini)
 
 ================= Priorite 2 ====================================
 - Tab acceuil pour afficher quelques conneries
@@ -17,3 +16,11 @@
 - 2 diagrammes UML
 - Tester le .jar sur d'autres pc
 - Mise sous forme jar et depot sur Moodle
+
+
+
+----rapport----
+- revenir sur lle livre des apres avoir quite
+- certains livres ont pas le meme format interieurement
+- certains livres ont un fichier .txt qui finit differemment
+- sauvegarder la liste des livres et charger depuis fichier (pas appel html)
