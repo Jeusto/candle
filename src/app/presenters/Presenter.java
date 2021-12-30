@@ -27,7 +27,7 @@ public class Presenter {
         view.show_view();
     }
 
-    public void search_performed(String query) throws IOException, InterruptedException, BadLocationException {
+    public void search_performed(String query) throws IOException {
         ArrayList<Book> results =  model.get_search(query);
         view.show_search_result(results);
     }
@@ -43,7 +43,7 @@ public class Presenter {
     }
 
     public void read_performed(String bookshelf, Integer id)
-            throws IOException, InterruptedException, BadLocationException {
+            throws IOException {
         view.show_book_view(model.get_book(bookshelf, id));
     }
 

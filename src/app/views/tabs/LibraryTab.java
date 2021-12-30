@@ -193,7 +193,7 @@ public class LibraryTab extends JPanel {
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 
             @Override
-            protected Void doInBackground() throws Exception {
+            protected Void doInBackground() {
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode) bookshelf_tree.getLastSelectedPathComponent();
                 if (node != null) {
                     Object node_info = node.getUserObject();

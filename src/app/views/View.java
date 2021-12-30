@@ -78,8 +78,7 @@ public class View extends JFrame {
         presenter.search_performed(query);
     }
 
-    public void show_search_result(ArrayList<Book> results) throws IOException, InterruptedException,
-            BadLocationException {
+    public void show_search_result(ArrayList<Book> results) throws IOException {
         search_tab.show_result(results);
     }
 

@@ -1,0 +1,15 @@
+Ce fichier contient une petite explication de l'utilisation du programme, les choix d'implémentation, de modélisation etc se trouvent dans le rapport.
+
+Pour ouvrir l'application, il suffit de lancer le .jar (peut-être besoin de lancer la commande `chmod +x book-reader-java-project.jar`)
+
+En haut de l'application il y a les onglets, le deuxième permet d'afficher la liste des livres disponibles. En cliquant sur une catégorie à gauche, on obtient la liste des livres à droite (il peut y avoir un peu de délai puisque rêquete serveur) On a trois boutons, un pour télécharger le livre localement, un autre pour le supprimer et un autre pour lire le livre.
+
+Une fois qu'on télécharge un livre, si on l'ouvre, ca sera la version locale qui sera ouvert et on pourra l'annoter (exceptionnellement quelques livres peuvent s'afficher bizarrement, c'est expliqué dans le rapport).
+
+Le bouton lire ouvre une nouvelle fenêtre pour lire le contenu du livre. Sur cette fêntre on peut soit revenir en arrière, soit scroller pour lire, soit ouvrir les paramètres d'affichage avec le bouton en haut à droite.
+Après avoir sélectionné un bout de texte, on peut faire clique droit pour ouvrir un menu où on peut soit copier le texte sélectioné, soit l'annoter, soit obtenir la définition. On peut également faire clique droit (sans forcement sélectionner de texte) sur une annotation et à nouveau dans le menu de clique droit, afficher l'annotation ou le supprimer.  
+Si on clique le bouton en haut a droite, les parametres d'affichage s'ouvre. On peut changer le theme visuel, changer la police d'ecriture (tous peuvent pas fonctionner, ca depend si la police est installé et a le même nom, Courier et Arial marche sur tout ce que j'ai testé). Enfin on peut changer la taille de la police. 
+
+De retour dans la page principale, le troisième onglet permet de taper une recherche et trouver des livres s'il y en a qui correspondent (peut prendre quelques secondes). On peut passer la souris dessus pour voir le titre complet ou cliquer sur l'image pour le lire. 
+
+Si on se sent inspirés après avoir lu, le quatrième onglet permet simplement d'ouvrir des fichiers pour les modifier ou d'écrire de nouveaux fichiers.
