@@ -32,11 +32,9 @@ public class Category {
     }
 
     private void load_books() throws IOException {
-        // If the bookshelf is already loaded, return
         if (!books.isEmpty() && !is_local) {
             return;
         }
-        // If the bookshelf is local, load the books from the local file
         if (is_local) {
             load_local_books();
         } else {
@@ -52,6 +50,7 @@ public class Category {
             if (file.isFile()) {
                 String fileName = file.getName();
                 String filePath = System.getProperty("user.home") + "/.candle-book-reader/" + fileName;
+
                 if (fileName.endsWith(".txt")) {
                     String title = fileName.substring(0, fileName.length() - 4);
                     Integer id = -1;
@@ -67,6 +66,7 @@ public class Category {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+
                     Book book = new Book(this.name, title, id, filePath, true, lastPosition);
                     books.put(id, book);
                 }
@@ -76,14 +76,12 @@ public class Category {
 
     private void load_remote_books() throws IOException {
         String bookshelfUrl = "https://www.gutenberg.org/ebooks/bookshelf/" + id.toString();
+
         while (true) {
-            // Connect to the URL
             Document doc = Jsoup.connect(bookshelfUrl).get();
 
-            // Get book titles
             Elements titles = doc.select(".booklink a.link .title");
 
-            // Get book IDs
             Elements IDs = doc.select(".booklink > a");
             ArrayList<String> idList = new ArrayList<String>();
             for (Element ID : IDs) {
@@ -91,14 +89,12 @@ public class Category {
                 idList.add(id);
             }
 
-            // Get book links
             Elements links = doc.select(".booklink a.link");
             ArrayList<String> linkList = new ArrayList<String>();
             for (Element link : links) {
                 linkList.add(link.attr("href"));
             }
 
-            // Add everything to hashmap
             for (int i = 0; i < titles.size(); i++) {
                 String title = titles.get(i).text();
                 Integer id = Integer.valueOf(idList.get(i));
@@ -107,7 +103,6 @@ public class Category {
                 books.put(Integer.valueOf(idList.get(i)), book);
             }
 
-            // Check if a .links > [title] exists
             Elements links_titles = doc.select(".links > a[accesskey^=\"+\"]");
             if (links_titles.size() == 0) {
                 return;

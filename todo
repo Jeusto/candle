@@ -1,0 +1,19 @@
+================= 2 ====================
+- Meilleures reglages d'afficagee (+ sauvegarde en memoire ?)
+- UML
+- Rapport
+- Tester tout les fonctionnalitees sur mon pc et sur le pc de Ata
+- Ameliorations code et fonctionnalite ?
+- Bon rendu
+
+================= Rapport ====================
+- Téléchargement de livres
+- Gestion des erreurs
+- Multi threading pour les opérations lourdes
+- Afficher la liste des livres en faisant une requete à chaque fois au lieu de télécharger la première fois
+- Fichier json pour les annotations etc
+- Json-simple, jsoup, flatlaf
+- Langage
+- Librairie graphique
+- Stockage de données et des livres
+- Conclusion / Difficulté et avis sur le travail accompli

@@ -48,8 +48,8 @@ public class View extends JFrame {
         this.presenter = presenter;
     }
 
-    public void initialize_content(models.entities.Library initial_library, HashMap<String,
-            String> user_settings) throws Exception {
+    public void initialize_content(models.entities.Library initial_library, HashMap<String, String> user_settings)
+            throws Exception {
         this.user_settings = user_settings;
 
         home_tab = new HomeTab();
@@ -78,7 +78,8 @@ public class View extends JFrame {
         presenter.search_performed(query);
     }
 
-    public void show_search_result(ArrayList<Book> results) throws IOException, InterruptedException, BadLocationException {
+    public void show_search_result(ArrayList<Book> results) throws IOException, InterruptedException,
+            BadLocationException {
         search_tab.show_result(results);
     }
 
@@ -90,8 +91,8 @@ public class View extends JFrame {
         library_tab.show_results(results);
     }
 
-    public void notify_read_performed(String bookshelf, Integer id) throws IOException,
-            InterruptedException, BadLocationException {
+    public void notify_read_performed(String bookshelf, Integer id) throws IOException, InterruptedException,
+            BadLocationException {
         presenter.read_performed(bookshelf, id);
     }
 
@@ -139,30 +140,27 @@ public class View extends JFrame {
         book_view.show_definition_result(selected_text, definition);
     }
 
-    public void notify_settings_change_performed(String theme, String font, String fontSize)
+    public void notify_settings_change_performed(String theme, String font_family, String font_size)
             throws BackingStoreException {
-        presenter.settings_change_performed(theme, font, fontSize);
+        presenter.settings_change_performed(theme, font_family, font_size);
     }
 
     public void change_settings(HashMap<String, String> settings) {
-        // Changer la police et la taillle de la police dans la vue "livre"
         book_view.change_font(settings.get("font_family"), settings.get("font_size"));
 
-        // Changer le theme
         try {
-            // On verifie que le parametre choisie n'est pas celui actuellement utilisé pour
-            // ne pas avoir à recharger la page
-            if (settings.get("theme").equals("Flat Dark") && !this.user_settings.get("theme").equals("Flat Dark")) {
+            if (settings.get("theme").equals("Flat Dark") && !user_settings.get("theme").equals("Flat Dark")) {
                 UIManager.setLookAndFeel(new FlatDarkLaf());
-            } else if (settings.get("theme").equals("Flat Light") && !this.user_settings.get("theme").equals("Flat Light")) {
+            } else if (settings.get("theme").equals("Flat Light") && !user_settings.get("theme").equals("Flat Light")) {
                 UIManager.setLookAndFeel(new FlatLightLaf());
-            } else if (settings.get("theme").equals("Flat Intellij") && !this.user_settings.get("theme").equals("Flat Intellij")) {
+            } else if (settings.get("theme").equals("Flat Intellij") && !user_settings.get("theme").equals("Flat Intellij")) {
                 UIManager.setLookAndFeel(new FlatIntelliJLaf());
-            } else if (settings.get("theme").equals("Flat Darcula") && !this.user_settings.get("theme").equals("Flat Darcula")) {
+            } else if (settings.get("theme").equals("Flat Darcula") && !user_settings.get("theme").equals("Flat Darcula")) {
                 UIManager.setLookAndFeel(new FlatDarculaLaf());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Il y a eu une erreur dans le changement " +
+                            "de thème.", "Erreur", JOptionPane.ERROR_MESSAGE);
         } finally {
             SwingUtilities.updateComponentTreeUI(this);
         }

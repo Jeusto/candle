@@ -9,10 +9,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Scanner;
 
-public class Definition  {
+public class Definition {
     private final String word;
     private final String definition;
-    private final String api_url = "https://api.dictionaryapi.dev/api/v2/entries/en/";
+    private static String api_url = "https://api.dictionaryapi.dev/api/v2/entries/en/";
 
     public Definition(String word) {
         this.word = word;
@@ -20,22 +20,19 @@ public class Definition  {
     }
 
     private static String define_word(String word) {
-        String definition = null;
-        JSONObject data_obj = null;
+        String definition;
+        JSONObject data_obj;
 
         try {
-            // On se connecte à l'API
-            URL url = new URL("https://api.dictionaryapi.dev/api/v2/entries/en/" + word);
+            URL url = new URL(api_url + word);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.connect();
 
-            // Si la requête n'a pas abouti, on renvoie null
             if (connection.getResponseCode() != 200) {
                 return null;
             }
 
-            // La requete a reussi, on recupere la reponse JSON dans un String
             String inline = "";
             Scanner scanner = new Scanner(url.openStream());
 
@@ -44,7 +41,6 @@ public class Definition  {
             }
             scanner.close();
 
-            // On traite l'objet JSON pour avoir la definition du mot
             JSONParser parse = new JSONParser();
             JSONArray site = (JSONArray) parse.parse(inline);
             data_obj = (JSONObject) parse.parse(site.get(0).toString());

@@ -14,30 +14,25 @@ import java.util.Scanner;
 public class Search {
     private final String query;
     private String result;
-    private final String api_url = "https://api.dictionaryapi.dev/api/v2/entries/en/";
+    private static String api_url = "https://gutendex.com/books/?search=";
 
     public Search(String query) {
         this.query = query;
     }
 
     public static ArrayList<Book> get_search(String query, Model model) {
-        String definition = null;
-        JSONObject data_obj = null;
         ArrayList<Book> results = new ArrayList<>();
         try {
-            // On se connecte à l'API
-            URL url = new URL("https://gutendex.com/books/?search=" + query.replace(" ", "%20"));
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.connect();
+            URL url = new URL(api_url + query.replace(" ", "%20"));
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.connect();
 
-            // Si la requête n'a pas abouti, on renvoie null
-            int responsecode = conn.getResponseCode();
-            if (responsecode != 200) {
+            int response_code = connection.getResponseCode();
+            if (response_code != 200) {
                 return null;
             }
 
-            // La requete a reussi, on recupere la reponse JSON dans un String
             String inline = "";
             Scanner scanner = new Scanner(url.openStream());
 
@@ -46,7 +41,6 @@ public class Search {
             }
             scanner.close();
 
-            // On traite l'objet JSON pour avoir le resultat
             JSONParser parse = new JSONParser();
             JSONObject site = (JSONObject) parse.parse(inline);
             JSONArray results_array = (JSONArray) site.get("results");
@@ -66,14 +60,9 @@ public class Search {
                 }
             }
         } catch (Exception e) {
-            //
+            return null;
         }
 
         return results;
-    }
-
-
-    public String get_search() {
-        return result;
     }
 }

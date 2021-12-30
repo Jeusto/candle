@@ -11,7 +11,6 @@ import java.awt.*;
 
 public class TabView extends JTabbedPane {
     public TabView(HomeTab home_tab, LibraryTab library_tab, SearchTab search_tab, WriteTab write_tab) throws Exception {
-        // Contenu =====================================================================================================
         Image homeIcon = ImageIO.read(getClass().getResource("/assets/home.png"));
         Image libraryIcon = ImageIO.read(getClass().getResource("/assets/library.png"));
         Image searchIcon = ImageIO.read(getClass().getResource("/assets/search.png"));
@@ -22,7 +21,6 @@ public class TabView extends JTabbedPane {
         addTab("Recherche", new ImageIcon(searchIcon), search_tab);
         addTab("Ecrire", new ImageIcon(writeIcon), write_tab);
 
-        // Parametres ==================================================================================================
         setTabPlacement(JTabbedPane.TOP);
         revalidate();
     }

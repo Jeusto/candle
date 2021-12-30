@@ -23,23 +23,26 @@ public class Library {
     }
 
     public void create_remote_bookshelves() throws MalformedURLException {
-        // On récupère la liste des catégories disponibles en lisant la page des categories et en extraitant les liens
         URL u = new URL("https://www.gutenberg.org/ebooks/bookshelf/");
 
         try {
             URLConnection uc = u.openConnection();
             BufferedReader in = new BufferedReader(new InputStreamReader(uc.getInputStream()));
             String inputLine;
+
             while ((inputLine = in.readLine()) != null) {
                 int index = inputLine.indexOf("/ebooks/bookshelf/");
+
                 while (index != -1) {
                     int index2 = inputLine.indexOf("\" title=\"", index + 18);
+
                     if (index2 == -1) {
                         index = -1;
                         continue;
                     }
                     Integer id = Integer.parseInt(inputLine.substring(index + 18, index2));
                     index = inputLine.indexOf("title=\"", index2);
+
                     while (index != -1) {
                         index2 = inputLine.indexOf("\"", index + 7);
                         String title = inputLine.substring(index + 7, index2);
@@ -56,13 +59,11 @@ public class Library {
     }
 
     public void create_local_bookshelves() {
-        // Creer le repertoire de l'application si il n'existe pas
         File app_directory = new File(System.getProperty("user.home") + "/.candle-book-reader");
         if (!app_directory.exists()) {
             app_directory.mkdir();
         }
 
-        // Charger les livres disponibles localement
         Category localCategory = new Category("Livres téléchargés", -1, true);
         categories.put("Livres téléchargés", localCategory);
     }

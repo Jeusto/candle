@@ -59,7 +59,7 @@ public class SettingsDialog extends JDialog implements Dialog {
 
         JLabel font_size_label = new JLabel("Choisir la ta taille de la police");
         font_size_selector = new JComboBox<>();
-        String[] font_size_possible_values = {"8", "9", "10", "11", "12", "14", "16", "18", "20", "22", "24", "26", "28", "36", "48", "72"};
+        String[] font_size_possible_values = {"11", "12", "14", "16", "18", "20", "22", "24", "26", "28", "36", "48", "72"};
         for (String possible_value : font_size_possible_values) {
             font_size_selector.addItem(possible_value);
         }

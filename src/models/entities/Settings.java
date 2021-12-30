@@ -7,7 +7,8 @@ import java.util.prefs.Preferences;
 public class Settings {
     private final String[] possible_themes = {"Flat Dark", "Flat Light", "Flat Intellij", "Flat Darcula"};
     private final String[] possible_font_families = {"Arial", "Courier", "Helvetica", "Times New Roman", "Verdana"};
-    private final Integer[] possible_font_sizes = {8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72};
+    private final String[] possible_font_sizes = {"11", "12", "14", "16", "18", "20", "22", "24", "26", "28", "36",
+            "48", "72"};
 
     private Preferences preferences;
 
@@ -23,10 +24,10 @@ public class Settings {
     }
 
     public HashMap<String, String> get_all_settings() {
-        HashMap<String, String> settings = new HashMap<String, String>();
+        HashMap<String, String> settings = new HashMap<>();
         settings.put("theme", preferences.get("theme", "Flat Dark"));
         settings.put("font_family", preferences.get("font_family", "Arial"));
-        settings.put("font_size", preferences.get("font_size", "12"));
+        settings.put("font_size", preferences.get("font_size", "14"));
         return settings;
     }
 

@@ -17,8 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-
 import static java.awt.event.MouseEvent.BUTTON3;
 
 public class BookView extends JPanel {
@@ -57,10 +55,7 @@ public class BookView extends JPanel {
         add(create_main_panel());
     }
 
-    // Fonctions pour creer l'interface ================================================================================
     private JPanel create_top_panel() throws IOException {
-        // Composants ==================================================================================================
-        // Boutons
         Image back_icon = ImageIO.read(getClass().getResource("/assets/back.png"));
         back_button = new JButton("Revenir en arrière");
         back_button.setIcon(new ImageIcon(back_icon));
@@ -69,7 +64,6 @@ public class BookView extends JPanel {
         settings_button = new JButton("Paramètres d'affichage");
         settings_button.setIcon(new ImageIcon(settings_icon));
 
-        // Action listeners
         back_button.addActionListener(e -> {
             back_button_action_listener();
         });
@@ -77,21 +71,18 @@ public class BookView extends JPanel {
             settings_button_action_listener();
         });
 
-        // Titre du livre
         current_book_title = new JLabel("Chargement du livre en cours...", SwingConstants.CENTER);
         current_book_title.setFont((current_book_title.getFont()).deriveFont(Font.PLAIN, 22));
         current_book_title.setPreferredSize(new Dimension(0, 27));
         current_book_title.setMinimumSize(new Dimension(0, 27));
         current_book_title.setMaximumSize(new Dimension(Short.MAX_VALUE * 10, 27));
 
-        // Parametres ==================================================================================================
         JPanel toolbar = new JPanel();
         toolbar.setLayout(new BoxLayout(toolbar, FlowLayout.RIGHT));
         toolbar.setBorder(new CompoundBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(128, 128, 128, 128)),
                 BorderFactory.createEmptyBorder(10, 20, 10, 20)
         ));
 
-        // Contenu =====================================================================================================
         toolbar.add(back_button);
         toolbar.add(Box.createHorizontalGlue());
         toolbar.add(current_book_title);
@@ -102,21 +93,17 @@ public class BookView extends JPanel {
     }
 
     private JPanel create_main_panel() {
-        // Composants ==================================================================================================
         text_pane = new JEditorPane();
         text_pane.setEditable(false);
         text_pane.setOpaque(false);
         text_pane.setCursor(new Cursor(Cursor.TEXT_CURSOR));
         text_pane.setContentType("text/plain");
 
-        // Afficher le menu quand on clique droit
         text_pane.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getButton() == BUTTON3) {
-                    // Garder en memoire la position du clique
                     last_mouse_position = text_pane.viewToModel2D(e.getPoint());
-                    // Afficher le menu
                     popup_menu.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
@@ -140,7 +127,6 @@ public class BookView extends JPanel {
         text_scroll_pane_wrapper.add(text_scroll_pane);
         text_scroll_pane_wrapper.add(Box.createHorizontalGlue());
 
-        // Partie du bas qui contient qui contient le nombre de livres dans la categorie
         JPanel bottom = new JPanel();
         bottom.setLayout(new BoxLayout(bottom, BoxLayout.X_AXIS));
         bottom.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -155,20 +141,16 @@ public class BookView extends JPanel {
         scroll_percentage.setIcon(new ImageIcon(progressionIcon));
         bottom.add(scroll_percentage);
 
-        // Contenu =====================================================================================================
         main_panel = new JPanel();
         main_panel.setLayout(new BoxLayout(main_panel, BoxLayout.Y_AXIS));
 
         main_panel.add(text_scroll_pane_wrapper);
         main_panel.add(bottom);
 
-
         return main_panel;
     }
 
     private JPopupMenu create_popup_menu() {
-        // Composants ==================================================================================================
-        // Boutons
         JMenuItem copy_btn = new JMenuItem("Copier");
         JMenuItem view_annotation_btn = new JMenuItem("Visualiser l'annotation");
         JMenuItem annotate_btn = new JMenuItem("Créer une annotation");
@@ -188,7 +170,7 @@ public class BookView extends JPanel {
             remove_annotation_icon = ImageIO.read(getClass().getResource("/assets/remove.png"));
             define_icon = ImageIO.read(getClass().getResource("/assets/define.png"));
         } catch (IOException e) {
-            // ignorer, au pire on aura pas d'icone
+            //
         }
 
         copy_btn.setIcon(new ImageIcon(copy_icon));
@@ -197,7 +179,6 @@ public class BookView extends JPanel {
         remove_annotation_btn.setIcon(new ImageIcon(remove_annotation_icon));
         define_btn.setIcon(new ImageIcon(define_icon));
 
-        // On associe des actions a chaque bouton
         copy_btn.addActionListener(e -> {
             copy_button_action_listener();
         });
@@ -214,7 +195,6 @@ public class BookView extends JPanel {
             define_button_action_listener();
         });
 
-        // On cree le menu de clique droit
         JPopupMenu popup_menu = new JPopupMenu();
         popup_menu.add(copy_btn);
         popup_menu.addSeparator();
@@ -227,9 +207,7 @@ public class BookView extends JPanel {
         return popup_menu;
     }
 
-    // Fonctions appelle par le presentateur en reponse a une action utilisateur =======================================
     public void show_book(Book book) {
-        // Modifier le titre et la categorie
         current_book_title.setText(book.get_title());
         current_bookshelf = book.get_bookshelf();
         current_book = book;
@@ -241,7 +219,7 @@ public class BookView extends JPanel {
         });
         scroll_percentage.setText("Progression dans la lecture : " + percentage + "%");
 
-        // Set text
+
         if (book.is_downloaded()) {
             try {
                 File file = new File(book.get_path());
@@ -261,17 +239,14 @@ public class BookView extends JPanel {
             }
         }
 
-        // Charger les annotations
         show_highlights();
     }
 
     public void show_highlights() {
-        // Charger les annotations
         annotations = new HashMap<>();
         annotations = current_book.load_annotations();
         text_pane.getHighlighter().removeAllHighlights();
 
-        // Ajouter un surlignage pour chaque annotation
         for (Map.Entry<Integer, Annotation> entry : annotations.entrySet()) {
             Annotation annotation = entry.getValue();
             Highlighter highlighter = text_pane.getHighlighter();
@@ -303,31 +278,29 @@ public class BookView extends JPanel {
         }
     }
 
-    // Actions listeners ===============================================================================================
     private void back_button_action_listener() {
         try {
-            // Notifier la vue qu'on veut aller en arrière
-            // get the percentage from the text pane
             int scrolledAmount = text_scroll_pane.getVerticalScrollBar().getValue();
             view.notify_back_performed(current_book.get_bookshelf(), current_book.get_id(),
                     scrolledAmount);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this,
+                    "Erreur liee au bouton retour", "Erreur", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void settings_button_action_listener() {
         try {
-            // On ouvre un nouvau dialogue pour les paramètres
             new SettingsDialog(view, this.getSize().width / 2, this.getSize().height / 2, this);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this,
+                    "Erreur liee au bouton retour", "Erreur", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void copy_button_action_listener() {
-        // Copier le texte selectionné dans le presse papier
         String selectedText = text_pane.getSelectedText();
+
         if (selectedText != null) {
             StringSelection stringSelection = new StringSelection(selectedText);
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -336,43 +309,39 @@ public class BookView extends JPanel {
     }
 
     private void view_annotate_button_action_listener() {
-        // On verifie si un surlignage qui passe par la position du curseur existe
         Highlighter highlighter = text_pane.getHighlighter();
         Highlighter.Highlight[] highlights = highlighter.getHighlights();
 
-        for (int i = 0; i < highlights.length - 1; i++) {
+        for (int i = 0; i < highlights.length; i++) {
             Highlighter.Highlight h = highlights[i];
+
             if (h.getStartOffset() <= last_mouse_position && h.getEndOffset() >= last_mouse_position) {
-                // On a trouvé un surlignage qui passe par la position du curseur, on l'affiche
                 JOptionPane.showMessageDialog(this, annotations.get(h.getStartOffset()).get_text(),
                         "Annotation", JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
         }
 
-        // On a pas trouvé de surlignage qui passe par la position du curseur, on affiche un message d'erreur
-        JOptionPane.showMessageDialog(this, "Il faut sélectionner une annotation pour le visualiser.", "Erreur", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(this, "Il faut sélectionner une annotation pour " +
+                "le visualiser.", "Erreur", JOptionPane.ERROR_MESSAGE);
     }
 
     private void annotate_button_action_listener() {
-        // On recupere la position de debut et la fin du texte selectionne
         int start = text_pane.getSelectionStart();
         int end = text_pane.getSelectionEnd();
 
-        // Si le livre n'est pas telecharge, on peut pas annoter, on affiche un message d'erreur
         if (current_book.is_downloaded() == false) {
             JOptionPane.showMessageDialog(this, "Il faut télécharger le livre avant de " +
                     "pouvoir ajouter des annotations.", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        // Si y a aucun texte selectionne, on affiche un message d'erreur
+
         if (start - end == 0) {
             JOptionPane.showMessageDialog(this, "Il faut sélectionner un texte pour " +
                     "l'annoter.", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // On verifie si un surlignage qui passe par la position du curseur existe
         Highlighter highlighter = text_pane.getHighlighter();
         Highlighter.Highlight[] highlightIndex = highlighter.getHighlights();
 
@@ -381,7 +350,6 @@ public class BookView extends JPanel {
             if ((start <= h.getStartOffset() && end >= h.getStartOffset()) ||
                     (start <= h.getEndOffset() && end >= h.getEndOffset()) ||
                     (start >= h.getStartOffset() && end <= h.getEndOffset())) {
-                // Il y a un surlignage qui passe par la position du curseur, on affiche un message d'erreur
                 JOptionPane.showMessageDialog(this, "Il y a une autre annotation qui " +
                         "empiète sur l'emplacement séléctionné.", "Erreur", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -389,7 +357,6 @@ public class BookView extends JPanel {
         }
 
         try {
-            // On affiche l'annotation
             new AnnotationDialog(view, this.getSize().width / 2, this.getSize().height / 2,
                     this, current_bookshelf, current_book.get_id(), start, end);
         } catch (IOException ex) {
@@ -398,7 +365,6 @@ public class BookView extends JPanel {
     }
 
     private void remove_annotation_button_action_listener() {
-        // On verifie si un surlignage qui passe par la position du curseur existe
         Highlighter highlighter = text_pane.getHighlighter();
         Highlighter.Highlight[] highlightIndex = highlighter.getHighlights();
 
@@ -407,10 +373,8 @@ public class BookView extends JPanel {
                 Annotation a = annotations.get(h.getStartOffset());
                 if (a != null) {
                     try {
-                        // Si oui on notifie la vue qu'on veut supprimer l'annotation
                         view.notify_annotation_remove_performed(current_bookshelf, current_book.get_id(), a.get_text(),
                                 a.get_start(), a.get_start());
-                        // On supprime le surlignage
                         highlighter.removeHighlight(h);
                         annotations.remove(h.getStartOffset());
                     } catch (IOException ex) {
@@ -421,7 +385,6 @@ public class BookView extends JPanel {
             }
         }
 
-        // On a pas trouvé de surlignage qui passe par la position du curseur, on affiche un message d'erreur
         JOptionPane.showMessageDialog(this, "Il faut sélectionner une annotation pour " +
                 "le supprimer.", "Erreur", JOptionPane.ERROR_MESSAGE);
     }
